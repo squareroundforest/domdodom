@@ -37,6 +37,9 @@ import {tag} from '../domdodom'
 // therefore: const quoted = define((_, content) => `"${content}"`)
 // all of these escaped
 
+// define a tag:
+// const myTag = define("foo")
+
 // define a component:
 // const component = define((props, children) => {
 //   if (!props.ready) {
