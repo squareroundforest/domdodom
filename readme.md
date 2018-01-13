@@ -114,4 +114,4 @@ const myComponent = define((props, children) => {
 })
 ```
 
-Components, just like tags are represented as stateless, pure functions.
+Components, just like tags are represented as stateless functions.
