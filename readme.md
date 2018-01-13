@@ -11,8 +11,8 @@ A javascript module for rendering DOM or HTML markup in a reactive style.
 
 ##### Setting props
 
-Setting props and tag attributes happens by passing an object or an array (or more, in fact) to a node. It
-creates a new node, leaving the original (tag.p) unchanged:
+Setting props and tag attributes happens by passing an object to a node. It creates a new node, leaving the
+original (tag.p) unchanged:
 
 ```JS
 tag.p({"class": "normal-text"})

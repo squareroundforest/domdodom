@@ -23,13 +23,13 @@ check: $(SOURCE) $(CONFIG)
 	@echo "check"
 
 check-lint: $(SOURCE) $(CONFIG)
-	npx standard $(SOURCE) *.js
+	@npx standard $(SOURCE) *.js
 
 check-deps: deps $(SOURCE) $(CONFIG)
 	npx snyk --quiet test
 
 lint: $(SOURCE) $(CONFIG)
-	npx standard --fix $(SOURCE) *.js
+	@npx standard --fix $(SOURCE) *.js
 
 check-all: check check-lint check-deps
 

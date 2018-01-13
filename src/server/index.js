@@ -4,7 +4,7 @@ import pretty from 'pretty'
 import path from 'path'
 
 import {markup} from '../domdodom'
-import page from '../app'
+import {page} from '../app'
 
 flags.defineBoolean('pretty')
 flags.parse()
