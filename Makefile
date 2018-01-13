@@ -3,10 +3,13 @@ CONFIG = $(shell ls *.js *.json)
 
 default: server
 
-dist/client/index.js: $(SOURCE) $(CONFIG)
+deps: $(CONFIG)
+	yarn install
+
+dist/client/index.js: deps $(SOURCE) $(CONFIG)
 	npx webpack --config webpack.config.client.js src/app dist/client/index.js
 
-dist/index.js: $(SOURCE) $(CONFIG)
+dist/index.js: deps $(SOURCE) $(CONFIG)
 	npx webpack --config webpack.config.server.js src/server dist/index.js
 
 client: dist/client/index.js
@@ -19,16 +22,16 @@ run: server
 check: $(SOURCE) $(CONFIG)
 	@echo "check"
 
-check-fmt: $(SOURCE) $(CONFIG)
+check-lint: $(SOURCE) $(CONFIG)
 	npx standard $(SOURCE) *.js
 
-check-deps: $(SOURCE) $(CONFIG)
+check-deps: deps $(SOURCE) $(CONFIG)
 	npx snyk --quiet test
 
-fmt: $(SOURCE) $(CONFIG)
+lint: $(SOURCE) $(CONFIG)
 	npx standard --fix $(SOURCE) *.js
 
-check-all: check check-fmt check-deps
+check-all: check check-lint check-deps
 
 precommit: $(SOURCE) $(CONFIG) check-all
 

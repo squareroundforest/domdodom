@@ -85,7 +85,7 @@ Or:
 "This an HTML code example: <em>foo</em>."
 ```
 
-Templates can be used, too, but the result will be escaped. E.g. quoting component:
+Templates can be used. E.g. a quoting component:
 
 ```JS
 const quoted = define((_, content) => `"${content}"`)
