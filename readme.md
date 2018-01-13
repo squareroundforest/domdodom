@@ -5,7 +5,7 @@ A javascript module for rendering DOM or HTML markup in a reactive style.
 ### Main Features
 
 - support for server side templating, client side reactive rendering, or universal (isomorphic) applications
-- definitions with simple JS functions
+- definitions with simple, declarative JS functions
 
 ### Definition Examples
 
@@ -114,4 +114,4 @@ const myComponent = define((props, children) => {
 })
 ```
 
-Components, just like tags are represented as stateless, pure functions.
+Components, just like tags are represented as stateless functions.
