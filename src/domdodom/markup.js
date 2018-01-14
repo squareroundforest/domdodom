@@ -1,41 +1,36 @@
 import {nodeType, inspect, isNode} from './define'
-
-const escapeHTML = s => s
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;')
-  .replace(/'/g, '&#039;')
-
-const validateSymbol = s => s // TODO
-const attributeName = name => name === 'className' ? 'class' : validateSymbol(name)
+import {escapeHTML, escapeAttribute, attributeName} from './html'
 
 const attributesMarkup = props => Object.keys(props).reduce(
-  (s, name) => s + ` ${attributeName(name)}="${escapeHTML(String(props[name]))}"`,
+  (s, name) => s + ` ${attributeName(name)}="${escapeAttribute(String(props[name]))}"`,
   ''
 )
+
+// TODO: join should be checked to behave similarly with non-nodes as text node siblings
 
 const childrenMarkup = children => children.map(
   c => isNode(c) ? markup(c) : escapeHTML(String(c).trim())
 ).join('')
 
-const tagMarkup = (def, props, children) => {
-  if (def.isVoid) {
-    return `<${def.name}${attributesMarkup(props)}>`
+const tagMarkup = spec => {
+  if (spec.def.isVoid) {
+    return `<${spec.def.name}${attributesMarkup(spec.props)}>`
   } else {
-    return `<${def.name}${attributesMarkup(props)}>${childrenMarkup(children)}</${def.name}>`
+    return `<${spec.def.name}${attributesMarkup(spec.props)}>` +
+    `${childrenMarkup(spec.children)}` +
+    `</${spec.def.name}>`
   }
 }
 
-const componentMarkup = (def, props, children) => {
-  const m = def.component(props, children)
+const componentMarkup = (spec) => {
+  const m = spec.def.component(spec.props, spec.children)
   return isNode(m) ? markup(m) : escapeHTML(String(m).trim())
 }
 
-export const markup = (node) => {
-  const {def, props, children} = inspect(node)
-  const markup = def.type === nodeType.component
-      ? componentMarkup
-      : tagMarkup
-  return markup(def, props, children)
+export const markup = node => {
+  const spec = inspect(node)
+  const markup = spec.def.type === nodeType.component
+    ? componentMarkup
+    : tagMarkup
+  return markup(spec)
 }

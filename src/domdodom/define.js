@@ -3,6 +3,8 @@ const isChild = a => !isPropSet(a)
 const getProps = args => args.filter(isPropSet)
 const getChildren = args => args.filter(isChild)
 
+// TODO: error if children for void tag
+
 const node = (spec) => {
   const n = (...args) => {
     if (args.length === 0) {

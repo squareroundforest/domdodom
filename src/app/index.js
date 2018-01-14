@@ -9,13 +9,18 @@ export const page = tag.html(
   tag.body(
     tag.h1('Hello, world!'),
     tag.p('Yes!!!'),
-    tag.div({className: 'root'})
+    tag.div({className: 'placeholder'})/*,
+    initClient */
   )
 )
 
+// TODO: maybe view should be renamed to render
+
 // const init = () => {
-//   const root = document.querySelector('.root')
-//   view(root, tag.div('yo'))
+//   // should not cause unnecessary dom change, because and component updates will become hard
+//   const placeholder = document.querySelector('.placeholder')
+//   const yo = render(placeholder, tag.div('yo'))
+//   yo('yoyo')
 // }
 //
 // if (typeof window !== 'undefined') {
