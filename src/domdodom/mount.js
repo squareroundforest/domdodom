@@ -1,37 +1,60 @@
-import {inspect, nodeType} from './define'
-import {attributeName, escapeAttribute} from './html'
+import {isElement, inspect, elementType, DefinitionError} from './define'
 
-const mountElement = (el, name) => {
-  if (el.tagName === name) {
-    return el
+const mountDOMElement = (name, existing) => {
+  if (existing && existing.tagName === name.toUpperCase()) {
+    return existing
   }
 
-  const nel = document.createElement(name)
-  el.parentNode.replaceChild(nel, el)
-  return nel
+  const newElement = document.createElement(name)
+  if (existing) {
+    existing.parentNode.replaceChild(newElement, existing)
+  }
+
+  return newElement
 }
 
-const mountChildren = (els, specs) => {
+const applyAttributes = (props, domElement) => {
+  Array.from(domElement.attributes).forEach(a => {
+    if (!(a.name in props)) {
+      domElement.removeAttribute(a.name)
+    }
+  })
+
+  Object.keys(props).forEach(name => domElement.setAttribute(name, props[name]))
+}
+
+const mountChildren = (nodes, domNodes) => {
   // equality
   // diff
 }
 
-const mountTag = (el, spec) => {
-  el = mountElement(el, spec.name)
-  Object.key(spec.props).forEach(prop => el.setAttribute(
-    attributeName(prop),
-    escapeAttribute(spec.props[prop])
-  ))
-
-  mountChildren(el.children, spec.children)
+const mountTag = (spec, domNode) => {
+  const domElement = mountDOMElement(spec.name, domNode)
+  applyAttributes(spec.props, domElement)
+  mountChildren(spec.children, domElement.childNodes)
+  return domElement
 }
 
 const mountComponent = (el, spec) => {}
 
-export const mount = (el, node) => {
+const mountText = () => {}
+
+const mountHTML = () => {}
+
+export const mount = (node, domNode) => {
+  if (!isElement(node)) {
+    return mountText(node, domNode)
+  }
+
   const spec = inspect(node)
-  const mount = spec.def.type === nodeType.component
-    ? mountComponent
-    : mountTag
-  return mount(el, spec)
+  switch (spec.def.type) {
+    case elementType.tag:
+      return mountTag(spec, domNode)
+    case elementType.component:
+      return mountComponent(spec, domNode)
+    case elementType.html:
+      return mountHTML(spec, domNode)
+    default:
+      throw new DefinitionError('unsupported element type')
+  }
 }

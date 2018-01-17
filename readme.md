@@ -1,11 +1,11 @@
-# Domdodom
+# Dömdödöm
 
 A javascript module for rendering DOM or HTML markup in a reactive style.
 
 ### Main Features
 
 - support for server side templating, client side reactive rendering, or universal (isomorphic) applications
-- definitions with simple, declarative JS functions
+- definitions and composition with simple, declarative JS functions
 
 ### Definition Examples
 

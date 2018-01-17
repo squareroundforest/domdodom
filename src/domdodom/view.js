@@ -10,15 +10,15 @@ import {nodeType, inspect} from './define'
 // TODO: track own attributes
 
 const viewTag = (el, spec) => {
-  // el.innerHTML = ""
-  // const el = document.createElement(spec.def.name)
-  // Object.keys(spec.props).forEach(key => el.setAttribute(
-  //   attributeName(key),
-  //   escapeHTML(spec.props[key])
-  // ))
+    // el.innerHTML = ""
+    // const el = document.createElement(spec.def.name)
+    // Object.keys(spec.props).forEach(key => el.setAttribute(
+    //   attributeName(key),
+    //   escapeHTML(spec.props[key])
+    // ))
 
-  // viewChildren(el.children, spec.children)
-  // el.appendChild(el)
+    // viewChildren(el.children, spec.children)
+    // el.appendChild(el)
 }
 
 const viewComponent = (el, spec) => {
@@ -27,11 +27,11 @@ const viewComponent = (el, spec) => {
 export const view = (el, node) => {
   const spec = inspect(node)
   if (!spec.mounted) {
-    // node = mount(el, node)
+        // node = mount(el, node)
   }
 
   const view = spec.def.type === nodeType.component
-    ? viewComponent
-    : viewTag
+        ? viewComponent
+        : viewTag
   return view(el, spec)
 }

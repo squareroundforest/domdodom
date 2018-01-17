@@ -1,18 +1,47 @@
-import {tag} from '../domdodom'
+// app.js:
+/* global dom tag */
 
-export const page = tag.html(
+const timer = dom.define(
+  () => new Date(),
+  {onrender: () => setTimeout(this, 999)}
+)
+
+const page = tag.html(
   {lang: 'en-US'},
   tag.head(
     tag.meta({charset: 'utf-8'}),
-    tag.script({src: '/client/index.js'})
+    tag.title('Timer')
   ),
   tag.body(
-    tag.h1('Hello, world!'),
-    tag.p('Yes!!!'),
-    tag.div({className: 'placeholder'})/*,
-    initClient */
+    timer,
+    tag.script({src: 'https://bit.ly/abc/domdodom.min.js'}),
+    tag.script({src: '/app.js'})
   )
 )
+
+if (typeof window === 'undefined') {
+  module.exports = page
+} else {
+  dom.mount(page)
+}
+
+// --
+
+// import {tag} from '../domdodom'
+
+// export const page = tag.html(
+//   {lang: 'en-US'},
+//   tag.head(
+//     tag.meta({charset: 'utf-8'}),
+//     tag.script({src: '/client/index.js'})
+//   ),
+//   tag.body(
+//     tag.h1('Hello, world!'),
+//     tag.p('Yes!!!'),
+//     tag.div({className: 'placeholder'})/*,
+//     initClient */
+//   )
+// )
 
 // TODO: maybe view should be renamed to render
 

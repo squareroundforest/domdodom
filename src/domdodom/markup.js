@@ -1,4 +1,4 @@
-import {nodeType, inspect, isNode} from './define'
+import {elementType, inspect, isElement, DefinitionError} from './define'
 import {escapeHTML, escapeAttribute, attributeName} from './html'
 
 const attributesMarkup = props => Object.keys(props).reduce(
@@ -6,31 +6,36 @@ const attributesMarkup = props => Object.keys(props).reduce(
   ''
 )
 
-// TODO: join should be checked to behave similarly with non-nodes as text node siblings
-
-const childrenMarkup = children => children.map(
-  c => isNode(c) ? markup(c) : escapeHTML(String(c).trim())
-).join('')
+const childrenMarkup = children => children.map(markup).join('')
 
 const tagMarkup = spec => {
   if (spec.def.isVoid) {
     return `<${spec.def.name}${attributesMarkup(spec.props)}>`
   } else {
     return `<${spec.def.name}${attributesMarkup(spec.props)}>` +
-    `${childrenMarkup(spec.children)}` +
-    `</${spec.def.name}>`
+      `${childrenMarkup(spec.children)}` +
+      `</${spec.def.name}>`
   }
 }
 
-const componentMarkup = (spec) => {
-  const m = spec.def.component(spec.props, spec.children)
-  return isNode(m) ? markup(m) : escapeHTML(String(m).trim())
-}
+const componentMarkup = spec => markup(spec.def.component(spec.props, spec.children))
+const htmlMarkup = spec => String(spec.children[0])
+const textMarkup = node => escapeHTML(String(node))
 
 export const markup = node => {
+  if (!isElement(node)) {
+    return textMarkup(node)
+  }
+
   const spec = inspect(node)
-  const markup = spec.def.type === nodeType.component
-    ? componentMarkup
-    : tagMarkup
-  return markup(spec)
+  switch (spec.def.type) {
+    case elementType.tag:
+      return tagMarkup(spec)
+    case elementType.component:
+      return componentMarkup(spec)
+    case elementType.html:
+      return htmlMarkup(spec)
+    default:
+      throw new DefinitionError('unsupported element type')
+  }
 }

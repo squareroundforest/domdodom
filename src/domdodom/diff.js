@@ -11,7 +11,7 @@ const findMatch = (eq, prev, next) => {
   let i
   let j
   for (i = 0; i < prev.length; i++) {
-    let done
+    let done = false
     for (j = 0; j < next.length; j++) {
       if (eq(prev[i], next[j])) {
         done = true
@@ -85,17 +85,14 @@ export const changeSet = (eq, prev, next) => {
   }
 }
 
-export const applyChangeSet = (remove, insert, changeSet, list, nextList) => {
+export const applyChangeSet = (remove, insert, list, nextList, changeSet) => {
   if (!Array.isArray(nextList)) {
     nextList = Array.from(nextList)
   }
 
-  let i
   let c
   let offset = 0
-  for (i = 0; i < changeSet.length; i++) {
-    c = changeSet[i]
-
+  for (c of changeSet) {
     if (c.deleteFrom !== c.deleteTo) {
       list = remove(list, c.deleteFrom + offset, c.deleteTo + offset)
       offset += c.deleteFrom - c.deleteTo
@@ -111,10 +108,10 @@ export const applyChangeSet = (remove, insert, changeSet, list, nextList) => {
 }
 
 // eq needs not to be commutative
-// remove and insert are allowed to mutate the list, their result is returned
-// list and next must be array-like or iterable
+// remove and insert are allowed to mutate the list, but their result is returned
+// list and nextList must be array-like or iterable
 // nextList or its items don't need to be of the same type as list
 export const applyDiff = (eq, remove, insert, list, nextList) => {
   const c = changeSet(eq, list, nextList)
-  return applyChangeSet(remove, insert, c, list, nextList)
+  return applyChangeSet(remove, insert, list, nextList, c)
 }

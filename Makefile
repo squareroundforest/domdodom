@@ -1,18 +1,20 @@
 SOURCE = $(shell find src -name "*.js")
 CONFIG = $(shell ls *.js *.json)
 
-default: build
-
 build: server
 
 deps: $(CONFIG)
-	yarn install
+	npm list yarn > /dev/null || npm install yarn
+	rm -f package-lock.json
+	npx --no-install yarn install
+
+install: deps server
 
 dist/client/index.js: $(SOURCE) $(CONFIG)
-	npx webpack --config webpack.config.client.js src/app dist/client/index.js
+	npx --no-install webpack --config webpack.config.client.js src/app dist/client/index.js
 
 dist/index.js: $(SOURCE) $(CONFIG)
-	npx webpack --config webpack.config.server.js src/server dist/index.js
+	npx --no-install webpack --config webpack.config.server.js src/server dist/index.js
 
 client: dist/client/index.js
 
@@ -22,21 +24,28 @@ run: server
 	@node dist --pretty
 
 check: $(SOURCE) $(CONFIG)
-	npx jest
+	npx --no-install jest --silent
 
 check-lint: $(SOURCE) $(CONFIG)
-	@npx standard $(SOURCE) *.js
+	@npx --no-install standard $(SOURCE) *.js
 
-check-deps: deps $(SOURCE) $(CONFIG)
-	npx snyk --quiet test
+snyk: $(CONFIG)
+	npx --no-install snyk --quiet test
+
+check-deps: $(CONFIG)
+	@echo snyk currently disabled for test run limitations
+	@echo you can run it explicitly by calling 'make snyk'
 
 lint: $(SOURCE) $(CONFIG)
-	@npx standard --fix $(SOURCE) *.js
+	@npx --no-install standard --fix $(SOURCE) *.js
 
 check-all: check-lint check-deps
-	npx jest --all
+	npx --no-install jest --silent --all
 
 precommit: $(SOURCE) $(CONFIG) check-all build
 
 clean:
 	rm -rf dist
+
+clean-all: clean
+	rm -rf node_modules

@@ -3,55 +3,79 @@ const isChild = a => !isPropSet(a)
 const getProps = args => args.filter(isPropSet)
 const getChildren = args => args.filter(isChild)
 
-// TODO: error if children for void tag
-
-const node = (spec) => {
-  const n = (...args) => {
+const element = (spec, ...args) => {
+  const el = (...args) => {
     if (args.length === 0) {
-      return n
+      return el
     }
 
     if (args[0] === inspect) {
       return spec
     }
 
-    return node({
+    if (spec.sealed) {
+      throw new DefinitionError('sealed element cannot be derived from')
+    }
+
+    const children = getChildren(args)
+    if (spec.isVoid && children.length > 0) {
+      throw new DefinitionError('void element cannot have children')
+    }
+
+    return element({
       def: spec.def,
       props: Object.assign({}, spec.props, ...getProps(args)),
-      children: [...spec.children, ...getChildren(args)]
+      children: [...spec.children, ...children]
     })
   }
 
-  return n
+  return el(...args)
 }
 
-const defineTag = (name, options) => {
-  return node({
-    def: Object.assign({type: nodeType.tag, name: name}, options),
-    props: {},
-    children: []
+const defineElement = (def, options, ...args) => {
+  return element({
+    def: Object.assign({}, options, def),
+    props: Object.assign({}, ...getProps(args)),
+    children: [...getChildren(args)]
   })
 }
 
-const defineComponent = (c) => {
-  return node({type: nodeType.component, component: c}, {}, [])
-}
+const defineTag = (name, options, ...args) =>
+  defineElement({type: elementType.tag, name: name}, options, ...args)
 
-export const nodeType = {
+const defineComponent = (c, options, ...args) =>
+  defineElement({type: elementType.component, component: c}, options, ...args)
+
+export const elementType = {
   tag: 0,
-  component: 1
+  component: 1,
+  html: 2
 }
 
-export const isNode = a => typeof a === 'function'
-export const inspect = node => node(inspect)
+export class DefinitionError extends Error {}
+export const isElement = a => typeof a === 'function'
+export const inspect = element => element(inspect)
 
-export const define = (d, options) => {
+// options can be: {isVoid: true, sealed: true}
+export const defineWithOptions = (d, options, ...args) => {
   switch (typeof d) {
     case 'function':
-      return defineComponent(d, options)
+      return defineComponent(d, options, ...args)
     case 'string':
-      return defineTag(d, options)
+      return defineTag(d, options, ...args)
     default:
       throw new Error('invalid definition')
   }
 }
+
+export const define = (d, ...args) => defineWithOptions(d, {}, ...args)
+
+export const innerHTML = html => {
+  if (isElement(html)) {
+    throw new DefinitionError('html element cannot be defined with an element')
+  }
+
+  return defineElement({type: elementType.html, sealed: true}, {}, html)
+}
+
+export const jsx = () => {}
