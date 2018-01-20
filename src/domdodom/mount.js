@@ -4,7 +4,8 @@ import {filterSupportedDOMNodes, syncDOMNode, syncDOMNodes} from './dom'
 import {applyDiff} from './diff'
 import {resolve} from './resolve'
 
-const tempNode = document.createElement('div')
+// TODO: move to dom
+const tempNode = typeof document !== 'undefined' ? document.createElement('div') : undefined
 
 const contentHTMLNodes = html => {
   tempNode.innerHTML = html
@@ -52,7 +53,7 @@ const mountEq = (domNode, node) => {
 
 const syncNode = (node, domNode) => {
   if (node instanceof Node) {
-    syncDOMNode(node, domNode)
+    syncDOMNode(domNode, node)
     return
   }
 
@@ -68,7 +69,7 @@ const getDOMNode = node => {
     case nodeType.tag:
       return document.createElement(node.name)
     case nodeType.text:
-      return document.createTextNode()
+      return document.createTextNode(node.text)
     default:
       throw new DefinitionError('unsupported node type')
   }
@@ -77,7 +78,7 @@ const getDOMNode = node => {
 const mountChildren = (node, children) => {
   const remove = (list, from, to) => {
     list.slice(from, to).forEach(n => {
-      if (n.parent === node) {
+      if (n.parentNode === node) {
         node.removeChild(n)
       }
     })
@@ -86,18 +87,20 @@ const mountChildren = (node, children) => {
 
   const insert = (list, at, nodes) => {
     const atNode = list.length > at ? list[at] : null
-    nodes.forEach(n => node.insertBefore(getDOMNode(n), atNode))
-    list.splice(at, 0, ...nodes)
+    const domNodes = nodes.map(getDOMNode)
+    domNodes.forEach(n => node.insertBefore(n, atNode))
+    list.splice(at, 0, ...domNodes)
   }
 
   children = resolveContentHTML(children)
-  const domChildren = filterSupportedDOMNodes([...node.children])
+  const domChildren = filterSupportedDOMNodes([...node.childNodes])
   applyDiff(mountEq, remove, insert, domChildren, children)
   children.forEach((c, i) => syncNode(c, domChildren[i]))
 }
 
 const mountTag = (spec, domNode) => {
-  const nextDomNode = domNode.nodeType !== Node.ELEMENT_NODE || domNode.tagName !== spec.name
+  // create a function for this check in dom
+  const nextDomNode = domNode.nodeType !== Node.ELEMENT_NODE || domNode.tagName !== spec.name.toUpperCase()
     ? document.createElement(spec.name)
     : domNode
 
@@ -105,29 +108,27 @@ const mountTag = (spec, domNode) => {
   mountChildren(nextDomNode, spec.children)
 
   if (nextDomNode !== domNode) {
-    domNode.parent.replaceChild(nextDomNode, domNode)
+    domNode.parentNode.replaceChild(nextDomNode, domNode)
   }
 
   return nextDomNode
 }
 
 const mountText = (node, domNode) => {
-  if (domNode.nodeName !== Node.TEXT_NODE) {
+  if (domNode.nodeType !== Node.TEXT_NODE) {
     const replace = document.createTextNode(node.text)
     domNode.parentNode.replaceChild(replace, domNode)
     return replace
   }
 
-  if (node.text === domNode.textContent) {
-    return domNode
+  if (domNode.textContent !== node.text) {
+    domNode.textContent = node.text
   }
-
-  domNode.textContent = node.text
   return domNode
 }
 
 const mountHTML = (node, domNode) => {
-  return syncDOMNodes(domNode.parent, [domNode], contentHTMLNodes(node.html))
+  return syncDOMNodes(domNode.parentNode, [domNode], contentHTMLNodes(node.html))
 }
 
 const mountNode = (node, domNode) => {

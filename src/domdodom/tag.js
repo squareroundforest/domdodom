@@ -1,6 +1,6 @@
 import {define} from './define'
 
-const tags = 'html, head, meta, script, body, div, ul, li, span, h1, p'
+const tags = 'html, head, title, meta, script, body, div, ul, li, span, h1, p'
 const voidTags = 'br'
 
 const tag = {}

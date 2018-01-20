@@ -39,3 +39,5 @@ export const markup = node => {
       throw new DefinitionError('unsupported element type')
   }
 }
+
+export const markupDoc = (node, type) => `<!doctype ${type || 'html'}>` + markup(node)

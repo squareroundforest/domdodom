@@ -1,11 +1,12 @@
 import {define} from './define'
-import {markup} from './markup'
-import {view} from './view'
-import {tag} from './tag'
+import {markup, markupDoc} from './markup'
+import {mount} from './mount'
+import tag from './tag'
 
 export {
     define,
     markup,
-    view,
+    markupDoc,
+    mount,
     tag
 }

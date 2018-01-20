@@ -2,7 +2,7 @@ import {isElement, nodeType, inspect, DefinitionError} from './define'
 import hash from './hash'
 
 const resolveTag = spec => {
-  const children = resolve(...spec.children)
+  const children = spec.children.map(resolve)
   return {
     type: nodeType.tag,
     name: spec.def.name,

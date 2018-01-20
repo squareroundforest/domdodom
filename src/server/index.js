@@ -1,16 +1,16 @@
 import flags from 'flags'
 import express from 'express'
-// import pretty from 'pretty'
+import pretty from 'pretty'
 import path from 'path'
 
-// import {markup} from '../domdodom'
-// import {page} from '../app'
+import {markupDoc} from '../domdodom'
+import {page} from '../app'
 
 flags.defineBoolean('pretty')
 flags.parse()
 
 const index = (_, res) => {
-    // res.write((flags.get('pretty') ? pretty : x => x)(markup(page)))
+  res.write((flags.get('pretty') ? pretty : x => x)(markupDoc(page)))
   res.end()
 }
 

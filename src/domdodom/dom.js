@@ -1,7 +1,7 @@
 /* global Node */
 import {changeSet, getUnchanged, applyChangeSet} from './diff'
 
-const supportedNodeTypes = [Node.ELEMENT_NODE, Node.TEXT_NODE]
+const supportedNodeTypes = typeof Node !== 'undefined' ? [Node.ELEMENT_NODE, Node.TEXT_NODE] : []
 
 const nodeTypeEq = (current, next) => {
   if (current.nodeType !== next.nodeType) {
