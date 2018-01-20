@@ -11,20 +11,20 @@ const insert = (a, at, items) => {
   return a
 }
 
-const testChangeSet = (title, prev, next, expected) => test('change set: ' + title, () => {
+const testChangeSet = (title, current, next, expected) => test('change set: ' + title, () => {
   const c = expected.map(e => {
     return {deleteFrom: e[0], deleteTo: e[1], insertFrom: e[2], insertTo: e[3]}
   })
-  expect(changeSet(Object.is, prev, next)).toEqual(c)
+  expect(changeSet(Object.is, current, next)).toEqual(c)
 })
 
-const testApply = (title, prev, next) => test('apply: ' + title, () => {
-  const c = changeSet(Object.is, prev, next)
-  expect(applyChangeSet(remove, insert, prev, next, c)).toEqual(next)
+const testApply = (title, current, next) => test('apply: ' + title, () => {
+  const c = changeSet(Object.is, current, next)
+  expect(applyChangeSet(remove, insert, current, next, c)).toEqual(next)
 })
 
 testChangeSet('both empty', [], [], [])
-testChangeSet('prev empty', [], [1, 2, 3], [[0, 0, 0, 3]])
+testChangeSet('current empty', [], [1, 2, 3], [[0, 0, 0, 3]])
 testChangeSet('next empty', [1, 2, 3], [], [[0, 3, 0, 0]])
 testChangeSet('unchanged', [1, 2, 3], [1, 2, 3], [])
 testChangeSet('prepend', [1, 2, 3], [-1, 0, 1, 2, 3], [[0, 0, 0, 2]])
@@ -57,7 +57,7 @@ testChangeSet('change everywhere', [1, 2, 3, 4, 5, 6, 7, 8, 9, 0], [-1.5, 3, 4, 
     [[0, 2, 0, 1], [4, 6, 3, 4], [8, 10, 6, 7]])
 
 testApply('both empty', [], [])
-testApply('prev empty', [], [1, 2, 3])
+testApply('current empty', [], [1, 2, 3])
 testApply('next empty', [1, 2, 3], [])
 testApply('unchanged', [1, 2, 3], [1, 2, 3])
 testApply('prepend', [1, 2, 3], [-1, 0, 1, 2, 3])

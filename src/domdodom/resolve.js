@@ -1,10 +1,10 @@
-import {isElement, elementType, inspect, DefinitionError} from './define'
+import {isElement, nodeType, inspect, DefinitionError} from './define'
 import hash from './hash'
 
 const resolveTag = spec => {
-  const children = spec.children.map(resolve)
+  const children = resolve(...spec.children)
   return {
-    type: resolvedType.tag,
+    type: nodeType.tag,
     name: spec.def.name,
     hash: hash(spec.def.name, ...children.map(c => c.hash)),
     props: spec.props,
@@ -16,7 +16,7 @@ const resolveComponent = spec => resolve(spec.component(spec.props, spec.childre
 
 const resolveText = text => {
   return {
-    type: resolvedType.text,
+    type: nodeType.text,
     text: String(text).trim(),
     hash: hash('#text'),
     props: {},
@@ -26,18 +26,12 @@ const resolveText = text => {
 
 const resolveHTML = spec => {
   return {
-    type: resolvedType.html,
+    type: nodeType.html,
     html: spec.children[0],
     hash: hash('#html'),
     props: {},
     children: []
   }
-}
-
-export const resolvedType = {
-  tag: 0,
-  text: 1,
-  html: 2
 }
 
 export const resolve = node => {
@@ -46,12 +40,12 @@ export const resolve = node => {
   }
 
   const spec = inspect(node)
-  switch (spec.def.elementType) {
-    case elementType.tag:
+  switch (spec.def.type) {
+    case nodeType.tag:
       return resolveTag(spec)
-    case elementType.component:
+    case nodeType.component:
       return resolveComponent(spec)
-    case elementType.html:
+    case nodeType.html:
       return resolveHTML(spec)
     default:
       throw new DefinitionError('unsupported element type')

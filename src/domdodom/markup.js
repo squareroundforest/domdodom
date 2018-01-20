@@ -1,4 +1,4 @@
-import {elementType, inspect, isElement, DefinitionError} from './define'
+import {nodeType, inspect, isElement, DefinitionError} from './define'
 import {escapeHTML, escapeAttribute, attributeName} from './html'
 
 const attributesMarkup = props => Object.keys(props).reduce(
@@ -29,11 +29,11 @@ export const markup = node => {
 
   const spec = inspect(node)
   switch (spec.def.type) {
-    case elementType.tag:
+    case nodeType.tag:
       return tagMarkup(spec)
-    case elementType.component:
+    case nodeType.component:
       return componentMarkup(spec)
-    case elementType.html:
+    case nodeType.html:
       return htmlMarkup(spec)
     default:
       throw new DefinitionError('unsupported element type')

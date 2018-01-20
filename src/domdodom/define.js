@@ -41,21 +41,23 @@ const defineElement = (def, options, ...args) => {
 }
 
 const defineTag = (name, options, ...args) =>
-  defineElement({type: elementType.tag, name: name}, options, ...args)
+  defineElement({type: nodeType.tag, name: name}, options, ...args)
 
 const defineComponent = (c, options, ...args) =>
-  defineElement({type: elementType.component, component: c}, options, ...args)
+  defineElement({type: nodeType.component, component: c}, options, ...args)
 
-export const elementType = {
+export const nodeType = {
   tag: 0,
   component: 1,
-  html: 2
+  text: 2,
+  html: 3
 }
 
 export class DefinitionError extends Error {}
 export const isElement = a => typeof a === 'function'
 export const inspect = element => element(inspect)
 
+// TODO: why can't this just be props
 // options can be: {isVoid: true, sealed: true}
 export const defineWithOptions = (d, options, ...args) => {
   switch (typeof d) {
@@ -70,12 +72,12 @@ export const defineWithOptions = (d, options, ...args) => {
 
 export const define = (d, ...args) => defineWithOptions(d, {}, ...args)
 
-export const innerHTML = html => {
+export const htmlContent = html => {
   if (isElement(html)) {
     throw new DefinitionError('html element cannot be defined with an element')
   }
 
-  return defineElement({type: elementType.html, sealed: true}, {}, html)
+  return defineElement({type: nodeType.html, sealed: true}, {}, html)
 }
 
 export const jsx = () => {}
