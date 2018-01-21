@@ -12,10 +12,10 @@ deps: $(CONFIG)
 install: deps server
 
 dist/client/index.js: $(SOURCE) $(CONFIG)
-	npx --no-install webpack --config webpack.config.client.js src/app dist/client/index.js
+	npx --no-install webpack --config webpack.config.client.js src/examples/testpage/app dist/client/index.js
 
 dist/index.js: $(SOURCE) $(CONFIG)
-	npx --no-install webpack --config webpack.config.server.js src/server dist/index.js
+	npx --no-install webpack --config webpack.config.server.js src/examples/testpage/server dist/index.js
 
 client: dist/client/index.js
 
@@ -24,7 +24,7 @@ server: client dist/index.js
 run: server
 	@node dist --pretty
 
-cover:
+cover: $(SOURCE) $(CONFIG)
 	npx --no-install jest --silent --coverage
 
 show-cover: cover
@@ -53,6 +53,7 @@ precommit: $(SOURCE) $(CONFIG) check-all build
 
 clean:
 	rm -rf dist
+	rm -rf coverage
 
 clean-all: clean
 	rm -rf node_modules

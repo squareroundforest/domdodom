@@ -3,7 +3,7 @@ import express from 'express'
 import pretty from 'pretty'
 import path from 'path'
 
-import {markupDoc} from '../domdodom'
+import {markupDoc} from '../../..'
 import {page} from '../app'
 
 flags.defineBoolean('pretty')

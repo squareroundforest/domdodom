@@ -1,4 +1,4 @@
-import {tag, mount} from '../domdodom'
+import {tag, mount} from '../../..'
 
 const app = tag.div('foo')
 export const page = tag.html(

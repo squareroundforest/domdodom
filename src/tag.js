@@ -1,4 +1,4 @@
-import {define} from './define'
+import {define, defineWithOptions} from './define'
 
 const tags = 'html, head, title, meta, script, body, div, ul, li, span, h1, p'
 const voidTags = 'br'
@@ -10,7 +10,7 @@ for (let name of tags.split(/ *, */)) {
 }
 
 for (let name of voidTags.split(/ *, */)) {
-  tag[name] = define(name, {isVoid: true})
+  tag[name] = defineWithOptions(name, {isVoid: true})
 }
 
 export default tag

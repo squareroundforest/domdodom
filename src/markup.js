@@ -40,4 +40,4 @@ export const markup = node => {
   }
 }
 
-export const markupDoc = (node, type) => `<!doctype ${type || 'html'}>` + markup(node)
+export const markupDoc = (node, type) => `<!doctype ${type || 'html'}>${markup(node)}`
