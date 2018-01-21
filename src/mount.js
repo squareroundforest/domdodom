@@ -37,11 +37,14 @@ const mountEq = (domNode, node) => {
   if (node instanceof Node) {
     return node.nodeType === domNode.nodeType &&
       (node.nodeType !== Node.ELEMENT_NODE ||
-      node.tagName === domNode.tagName)
+      node.name === domNode.tagName)
   }
 
   if (node.type === nodeType.tag) {
-    return domNode.nodeType === Node.ELEMENT_NODE && node.name === domNode.tagName
+    return (
+      domNode.nodeType === Node.ELEMENT_NODE &&
+      node.name === domNode.tagName
+    )
   }
 
   return true
@@ -91,7 +94,9 @@ const mountChildren = (node, children) => {
 
 const mountTag = (spec, domNode) => {
   // create a function for this check in dom
-  const nextDomNode = domNode.nodeType !== Node.ELEMENT_NODE || domNode.tagName !== spec.name.toUpperCase()
+  const nextDomNode =
+    domNode.nodeType !== Node.ELEMENT_NODE ||
+    domNode.tagName !== spec.name
     ? document.createElement(spec.name)
     : domNode
 
@@ -115,11 +120,12 @@ const mountText = (node, domNode) => {
   if (domNode.textContent !== node.text) {
     domNode.textContent = node.text
   }
+
   return domNode
 }
 
 const mountHTML = (node, domNode) => {
-  return syncDOMNodes(domNode.parentNode, [domNode], contentHTMLNodes(node.html))
+  return syncDOMNodes(domNode.parentNode, [domNode], contentHTMLNodes(node.html), domNode.nextSibling)
 }
 
 const mountNode = (node, domNode) => {

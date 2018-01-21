@@ -7,4 +7,4 @@ export const escapeHTML = s => s
 
 export const escapeAttribute = s => s // TODO
 export const validateSymbol = s => s // TODO
-export const attributeName = name => name === 'className' ? 'class' : validateSymbol(name)
+export const attributeName = name => validateSymbol(name)

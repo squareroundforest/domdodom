@@ -29,16 +29,18 @@ const syncAttributes = (current, next) => {
 
 const syncElement = (current, next) => {
   syncAttributes(current, next)
-  syncDOMNodes(current, current.childNodes, next.childNodes)
+  syncDOMNodes(current, current.childNodes, next.childNodes, null)
 }
 
 const syncTextNode = (current, next) => {
-  current.textContent = next.textContent
+  if (current.textContent !== next.textContent) {
+    current.textContent = next.textContent
+  }
 }
 
 export const filterSupportedDOMNodes = nodes => nodes.filter(n => supportedNodeTypes.some(nt => nt === n.nodeType))
 
-export const syncDOMNodes = (parent, nodes, nextNodes) => {
+export const syncDOMNodes = (parent, nodes, nextNodes, before) => {
   const remove = (nodes, from, to) => {
     nodes.slice(from, to).forEach(n => parent.removeChild(n))
     nodes.splice(from, to - from)
@@ -46,7 +48,7 @@ export const syncDOMNodes = (parent, nodes, nextNodes) => {
   }
 
   const insert = (nodes, at, nextNodes) => {
-    const atNode = nodes.length > at ? nodes[at] : null
+    const atNode = nodes.length > at ? nodes[at] : before
     nextNodes.forEach(n => parent.insertBefore(n, atNode))
     nodes.splice(at, 0, ...nextNodes)
     return nodes

@@ -5,7 +5,7 @@ const resolveTag = spec => {
   const children = spec.children.map(resolve)
   return {
     type: nodeType.tag,
-    name: spec.def.name,
+    name: spec.def.name.toUpperCase(),
     hash: hash(spec.def.name, ...children.map(c => c.hash)),
     props: spec.props,
     children: children

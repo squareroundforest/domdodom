@@ -1,6 +1,10 @@
-import {tag, render} from '../../..'
+import {tag, render, htmlContent} from '../../..'
 
-const app = tag.div('foo')
+const app = tag.div(
+  {id: 'root'},
+  htmlContent("<div id='ref'><ul><li>foo</li><li>bar</li><li>baz</li></ul></div>")
+)
+
 export const page = tag.html(
   {lang: 'en-US'},
   tag.head(
@@ -14,10 +18,25 @@ export const page = tag.html(
 )
 
 if (typeof window !== 'undefined') {
-  console.log('waiting...')
+  const initial = tag.div(
+    {id: 'ref'},
+    tag.div('foo'),
+    tag.div('bar'),
+    tag.div('baz'),
+    tag.div('qux')
+  )
+
+  const update = tag.div(
+    {id: 'ref'},
+    tag.div('foo'),
+    tag.code('bar'),
+    tag.div('baz'),
+    tag.div('qux')
+  )
+
+  render(initial, document.getElementById('ref'))
   setTimeout(() => {
-    console.log('mounting')
-    render(app, document.querySelector('div'))
-    console.log('done')
+    console.log('updating')
+    render(update, document.getElementById('ref'))
   }, 999)
 }

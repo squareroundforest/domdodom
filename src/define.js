@@ -1,11 +1,21 @@
-const isPropSet = a => a.constructor === Object
-const isChild = a => !isPropSet(a)
-const getProps = args => args.filter(isPropSet)
+const propNames = props => {
+  const renamed = {}
+  Object.keys(props).forEach(name => {
+    renamed[(name === 'className' ? 'class' : name)] = props[name]
+  })
+
+  return renamed
+}
+
+const isProps = a => a.constructor === Object
+const isChild = a => !isProps(a)
+const getProps = args => args.filter(isProps).map(propNames)
 const getChildren = args => args.filter(isChild)
 
 // TODO:
-// - support base props during definition (for classes)
+// - support base props during definition (for classes)?
 // - verify supported node types
+// - how to have multiple handlers? shall we allow it?
 
 const element = (spec, ...args) => {
   const el = (...args) => {

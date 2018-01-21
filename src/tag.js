@@ -1,6 +1,6 @@
 import {define, defineWithOptions} from './define'
 
-const tags = 'html, head, title, meta, script, body, div, ul, li, span, h1, p'
+const tags = 'html, head, title, meta, script, body, div, ol, ul, li, span, h1, p, code'
 const voidTags = 'br'
 
 export const tag = {}
@@ -12,3 +12,5 @@ for (let name of tags.split(/ *, */)) {
 for (let name of voidTags.split(/ *, */)) {
   tag[name] = defineWithOptions(name, {isVoid: true})
 }
+
+// TODO: generate exported tags offline (https://developer.mozilla.org/en-US/docs/Web/HTML/Element)

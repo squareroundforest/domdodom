@@ -1,62 +1,54 @@
 /* global document test expect beforeEach */
-import {define, markup, tag, render, htmlContent} from '.'
-
-let ph
-
-const checkDOM = n => expect(document.body.innerHTML).toBe(markup(n))
-
-const initDOM = n => {
-  document.body.innerHTML = markup(n({id: 'placeholder'}))
-  ph = document.getElementById('placeholder')
-}
+import {define, tag, render, htmlContent} from '.'
+import {root, checkDOM, initDOM} from './domtest'
 
 beforeEach(() => initDOM(tag.div))
 
 test('element', () => {
   const p = tag.p({'class': 'pretty'}, 'foo')
-  render(p, ph)
+  render(p, root)
   checkDOM(p)
 })
 
 test('component', () => {
   const foo = define(() => 'foo')
-  render(foo, ph)
+  render(foo, root)
   checkDOM(foo)
 })
 
 test('text', () => {
-  render('foo', ph)
+  render('foo', root)
   checkDOM('foo')
 })
 
 test('text, escaped', () => {
   const t = '<p>foo</p>'
-  render(t, ph)
+  render(t, root)
   checkDOM(t)
 })
 
 test('text, convert', () => {
-  render(42, ph)
+  render(42, root)
   checkDOM(42)
 })
 
 test('update attributes', () => {
   initDOM(tag.p({'class': 'before'}, 'foo'))
   const p = tag.p({'class': 'after'}, 'foo')
-  render(p, ph)
+  render(p, root)
   checkDOM(p)
 })
 
 test('update text', () => {
   initDOM(tag.p('foo'))
   const p = tag.p('bar')
-  render(p, ph)
+  render(p, root)
   checkDOM(p)
 })
 
 test('html', () => {
   const html = htmlContent('<p>foo</p>')
-  render(html, ph)
+  render(html, root)
   checkDOM(html)
 })
 
@@ -67,7 +59,7 @@ test('html as child', () => {
     tag.p('qux')
   )
 
-  render(div, ph)
+  render(div, root)
   checkDOM(div)
 })
 
@@ -79,24 +71,24 @@ test('html as child, to existing', () => {
   )
 
   initDOM(div)
-  render(div, ph)
+  render(div, root)
   checkDOM(div)
 })
 
 test('html content, change node type', () => {
   initDOM(tag.div(htmlContent('<div><p>foo</p><p>bar</p><p>baz</p></div>')))
   const div = tag.div(htmlContent('<div><p>foo</p>bar<p>baz</p></div>'))
-  render(div, ph)
+  render(div, root)
   checkDOM(div)
 })
 
 test('html content, changing attributes', () => {
   initDOM(tag.div(htmlContent('<div><p>foo</p><p class="pretty" style="red">bar</p><p>baz</p></div>')))
   const div = tag.div(htmlContent('<div><p>foo</p><p style="background: pink">bar</p><p>baz</p></div>'))
-  render(div, ph)
+  render(div, root)
   checkDOM(div)
 })
 
 test('unsupported element', () => {
-  expect(() => render(() => { return {def: {type: -1}} }, ph)).toThrow(/unsupported/)
+  expect(() => render(() => { return {def: {type: -1}} }, root)).toThrow(/unsupported/)
 })

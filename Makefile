@@ -22,7 +22,7 @@ client: dist/client/index.js
 server: client dist/index.js
 
 run: server
-	@node dist --pretty
+	@node dist
 
 cover: $(SOURCE) $(CONFIG)
 	npx --no-install jest --silent --coverage
