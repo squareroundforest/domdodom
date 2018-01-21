@@ -1,13 +1,3 @@
-// TODO: enough to use an array
-const change = (dfrom, dto, ifrom, ito) => {
-  return {
-    deleteFrom: dfrom,
-    deleteTo: dto,
-    insertFrom: ifrom,
-    insertTo: ito
-  }
-}
-
 const findMatch = (eq, current, next) => {
   let i
   let j
@@ -39,6 +29,7 @@ const findNoMatch = (eq, current, next) => {
   return i
 }
 
+// [[deleteFrom, deleteTo, insertFrom, insertTo], ...]
 export const changeSet = (eq, current, next) => {
   const changes = []
 
@@ -48,12 +39,12 @@ export const changeSet = (eq, current, next) => {
   for (;;) {
     if (index.current === current.length || index.next === next.length) {
       if (index.current < current.length || index.next < next.length) {
-        changes.push(change(
+        changes.push([
           index.current,
           current.length,
           index.next,
           next.length
-        ))
+        ])
       }
 
       return changes
@@ -61,12 +52,12 @@ export const changeSet = (eq, current, next) => {
 
     match = findMatch(eq, current.slice(index.current), next.slice(index.next))
     if (match.current > 0 || match.next > 0) {
-      changes.push(change(
+      changes.push([
         index.current,
         index.current + match.current,
         index.next,
-        index.next + match.next)
-      )
+        index.next + match.next
+      ])
     }
 
     index.current += match.current
@@ -82,14 +73,14 @@ export const forEachUnchanged = (current, next, changeSet, proc) => {
   let currentFrom = 0
   let nextFrom = 0
   for (let c of changeSet) {
-    if (c.deleteFrom > currentFrom || c.insertFrom > nextFrom) {
-      for (let i = currentFrom; i < c.deleteFrom; i++) {
+    if (c[0] > currentFrom || c[2] > nextFrom) {
+      for (let i = currentFrom; i < c[0]; i++) {
         proc(current[i], next[i + nextFrom - currentFrom])
       }
     }
 
-    currentFrom = c.deleteTo
-    nextFrom = c.insertTo
+    currentFrom = c[1]
+    nextFrom = c[3]
   }
 
   if (current.length > currentFrom || next.length > nextFrom) {
@@ -102,14 +93,14 @@ export const forEachUnchanged = (current, next, changeSet, proc) => {
 export const applyChangeSet = (remove, insert, list, nextList, changeSet) => {
   let offset = 0
   for (let c of changeSet) {
-    if (c.deleteFrom !== c.deleteTo) {
-      list = remove(list, c.deleteFrom + offset, c.deleteTo + offset)
-      offset += c.deleteFrom - c.deleteTo
+    if (c[0] !== c[1]) {
+      list = remove(list, c[0] + offset, c[1] + offset)
+      offset += c[0] - c[1]
     }
 
-    if (c.insertFrom !== c.insertTo) {
-      list = insert(list, c.deleteTo + offset, nextList.slice(c.insertFrom, c.insertTo))
-      offset += c.insertTo - c.insertFrom
+    if (c[2] !== c[3]) {
+      list = insert(list, c[1] + offset, nextList.slice(c[2], c[3]))
+      offset += c[3] - c[2]
     }
   }
 

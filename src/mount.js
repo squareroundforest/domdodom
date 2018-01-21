@@ -1,68 +1,19 @@
 /* global Node document */
 import {nodeType} from './define'
-import {filterSupportedDOMNodes, syncDOMNode, syncDOMNodes} from './dom'
+import {filterSupportedDOMNodes, syncDOMNode, syncDOMRange, htmlToDOMNodes, applyProps} from './dom'
 import {applyDiff} from './diff'
 import {resolve} from './resolve'
-
-// TODO: move to dom
-const tempNode = typeof document !== 'undefined' ? document.createElement('div') : undefined
-
-const contentHTMLNodes = html => {
-  tempNode.innerHTML = html
-  const nodes = filterSupportedDOMNodes([...tempNode.childNodes])
-  tempNode.innerHTML = ''
-  return nodes
-}
-
-const applyAttributes = (props, domElement) => {
-  [...domElement.attributes].forEach(a => {
-    if (!(a.name in props)) {
-      domElement.removeAttribute(a.name)
-    }
-  })
-
-  Object.keys(props).forEach(name => domElement.setAttribute(name, props[name]))
-}
 
 const resolveContentHTML = nodes => nodes.reduce(
   (nodes, current) => nodes.concat(
     current.type === nodeType.html
-      ? contentHTMLNodes(current.html)
+      ? htmlToDOMNodes(current.html)
       : current
   ),
   []
 )
 
-const mountEq = (domNode, node) => {
-  if (node instanceof Node) {
-    return (
-      node.nodeType === domNode.nodeType && (
-        node.nodeType !== Node.ELEMENT_NODE ||
-        node.name === domNode.tagName
-      )
-    )
-  }
-
-  if (node.type === nodeType.tag) {
-    return (
-      domNode.nodeType === Node.ELEMENT_NODE &&
-      node.name === domNode.tagName
-    )
-  }
-
-  return true
-}
-
-const syncNode = (node, domNode) => {
-  if (node instanceof Node) {
-    syncDOMNode(domNode, node)
-    return
-  }
-
-  mountNode(node, domNode)
-}
-
-const getDOMNode = node => {
+const nodeToDOMNode = node => {
   if (node instanceof Node) {
     return node
   }
@@ -75,6 +26,26 @@ const getDOMNode = node => {
 }
 
 const mountChildren = (node, children) => {
+  const eq = (domNode, node) => {
+    if (node instanceof Node) {
+      return (
+        node.nodeType === domNode.nodeType && (
+          node.nodeType !== Node.ELEMENT_NODE ||
+          node.name === domNode.tagName
+        )
+      )
+    }
+
+    if (node.type === nodeType.tag) {
+      return (
+        domNode.nodeType === Node.ELEMENT_NODE &&
+        node.name === domNode.tagName
+      )
+    }
+
+    return true
+  }
+
   const remove = (list, from, to) => {
     list.slice(from, to).forEach(n => node.removeChild(n))
     list.splice(from, to - from)
@@ -83,7 +54,7 @@ const mountChildren = (node, children) => {
 
   const insert = (list, at, nodes) => {
     const atNode = list.length > at ? list[at] : null
-    const domNodes = nodes.map(getDOMNode)
+    const domNodes = nodes.map(nodeToDOMNode)
     domNodes.forEach(n => node.insertBefore(n, atNode))
     list.splice(at, 0, ...domNodes)
     return list
@@ -91,8 +62,8 @@ const mountChildren = (node, children) => {
 
   children = resolveContentHTML(children)
   const domChildren = filterSupportedDOMNodes([...node.childNodes])
-  applyDiff(mountEq, remove, insert, domChildren, children)
-  children.forEach((c, i) => syncNode(c, domChildren[i]))
+  applyDiff(eq, remove, insert, domChildren, children)
+  children.forEach((c, i) => mountNode(c, domChildren[i]))
 }
 
 const mountTag = (spec, domNode) => {
@@ -103,7 +74,7 @@ const mountTag = (spec, domNode) => {
     ? document.createElement(spec.name)
     : domNode
 
-  applyAttributes(spec.props, nextDomNode)
+  applyProps(nextDomNode, spec.props)
   mountChildren(nextDomNode, spec.children)
 
   if (nextDomNode !== domNode) {
@@ -128,15 +99,20 @@ const mountText = (node, domNode) => {
 }
 
 const mountHTML = (node, domNode) => {
-  return syncDOMNodes(
+  return syncDOMRange(
     domNode.parentNode,
     [domNode],
-    contentHTMLNodes(node.html),
+    htmlToDOMNodes(node.html),
     domNode.nextSibling
   )
 }
 
 const mountNode = (node, domNode) => {
+  if (node instanceof Node) {
+    syncDOMNode(domNode, node)
+    return
+  }
+
   switch (node.type) {
     case nodeType.tag:
       return mountTag(node, domNode)

@@ -12,10 +12,7 @@ const insert = (a, at, items) => {
 }
 
 const testChangeSet = (title, current, next, expected) => test('change set: ' + title, () => {
-  const c = expected.map(e => {
-    return {deleteFrom: e[0], deleteTo: e[1], insertFrom: e[2], insertTo: e[3]}
-  })
-  expect(changeSet(Object.is, current, next)).toEqual(c)
+  expect(changeSet(Object.is, current, next)).toEqual(expected)
 })
 
 const testApply = (title, current, next) => test('apply: ' + title, () => {
