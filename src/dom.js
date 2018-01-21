@@ -29,7 +29,7 @@ const syncAttributes = (current, next) => {
 
 const syncElement = (current, next) => {
   syncAttributes(current, next)
-  syncDOMNodes(current, next.childNodes)
+  syncDOMNodes(current, current.childNodes, next.childNodes)
 }
 
 const syncTextNode = (current, next) => {

@@ -1,4 +1,4 @@
-import {tag, mount} from '../../..'
+import {tag, render} from '../../..'
 
 const app = tag.div('foo')
 export const page = tag.html(
@@ -17,7 +17,7 @@ if (typeof window !== 'undefined') {
   console.log('waiting...')
   setTimeout(() => {
     console.log('mounting')
-    mount(app, document.querySelector('div'))
+    render(app, document.querySelector('div'))
     console.log('done')
   }, 999)
 }

@@ -27,7 +27,7 @@ run: server
 cover: $(SOURCE) $(CONFIG)
 	npx --no-install jest --silent --coverage
 
-show-cover: cover
+showcover: cover
 	$(BROWSER) coverage/lcov-report/index.html
 
 check: $(SOURCE) $(CONFIG)

@@ -3,6 +3,10 @@ const isChild = a => !isPropSet(a)
 const getProps = args => args.filter(isPropSet)
 const getChildren = args => args.filter(isChild)
 
+// TODO:
+// - support base props during definition (for classes)
+// - verify supported node types
+
 const element = (spec, ...args) => {
   const el = (...args) => {
     if (args.length === 0) {
@@ -13,12 +17,12 @@ const element = (spec, ...args) => {
       return spec
     }
 
-    if (spec.sealed) {
+    if (spec.def.sealed) {
       throw new DefinitionError('sealed element cannot be derived from')
     }
 
     const children = getChildren(args)
-    if (spec.isVoid && children.length > 0) {
+    if (spec.def.isVoid && children.length > 0) {
       throw new DefinitionError('void element cannot have children')
     }
 
@@ -66,7 +70,7 @@ export const defineWithOptions = (d, options, ...args) => {
     case 'string':
       return defineTag(d, options, ...args)
     default:
-      throw new Error('invalid definition')
+      throw new DefinitionError('invalid definition')
   }
 }
 

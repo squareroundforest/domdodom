@@ -1,12 +1,4 @@
-import {define} from './define'
-import {markup, markupDoc} from './markup'
-import {mount} from './mount'
-import tag from './tag'
-
-export {
-    define,
-    markup,
-    markupDoc,
-    mount,
-    tag
-}
+export {define, htmlContent} from './define'
+export {tag} from './tag'
+export {render} from './render'
+export {markup, markupDoc} from './markup'

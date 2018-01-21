@@ -1,5 +1,5 @@
 /* global Node */
-import {nodeType, DefinitionError} from './define'
+import {nodeType} from './define'
 import {filterSupportedDOMNodes, syncDOMNode, syncDOMNodes} from './dom'
 import {applyDiff} from './diff'
 import {resolve} from './resolve'
@@ -44,11 +44,7 @@ const mountEq = (domNode, node) => {
     return domNode.nodeType === Node.ELEMENT_NODE && node.name === domNode.tagName
   }
 
-  if (node.type === nodeType.text) {
-    return true
-  }
-
-  throw new DefinitionError('unsupported node type')
+  return true
 }
 
 const syncNode = (node, domNode) => {
@@ -65,24 +61,18 @@ const getDOMNode = node => {
     return node
   }
 
-  switch (node.type) {
-    case nodeType.tag:
-      return document.createElement(node.name)
-    case nodeType.text:
-      return document.createTextNode(node.text)
-    default:
-      throw new DefinitionError('unsupported node type')
+  if (node.type === nodeType.tag) {
+    return document.createElement(node.name)
   }
+
+  return document.createTextNode(node.text)
 }
 
 const mountChildren = (node, children) => {
   const remove = (list, from, to) => {
-    list.slice(from, to).forEach(n => {
-      if (n.parentNode === node) {
-        node.removeChild(n)
-      }
-    })
+    list.slice(from, to).forEach(n => node.removeChild(n))
     list.splice(from, to - from)
+    return list
   }
 
   const insert = (list, at, nodes) => {
@@ -90,6 +80,7 @@ const mountChildren = (node, children) => {
     const domNodes = nodes.map(getDOMNode)
     domNodes.forEach(n => node.insertBefore(n, atNode))
     list.splice(at, 0, ...domNodes)
+    return list
   }
 
   children = resolveContentHTML(children)
@@ -139,8 +130,6 @@ const mountNode = (node, domNode) => {
       return mountText(node, domNode)
     case nodeType.html:
       return mountHTML(node, domNode)
-    default:
-      throw new DefinitionError('unsupported node type')
   }
 }
 

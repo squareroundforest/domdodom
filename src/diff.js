@@ -38,6 +38,29 @@ const findNoMatch = (eq, current, next) => {
   return i
 }
 
+const getUnchanged = (changeSet, currentLength, nextLength) => {
+  const unchanged = []
+  const block = [0, 0, 0, 0]
+  for (let c of changeSet) {
+    if (c.deleteFrom > block[0] || c.insertFrom > block[2]) {
+      block[1] = c.deleteFrom
+      block[3] = c.insertFrom
+      unchanged.push([...block])
+    }
+
+    block[0] = c.deleteTo
+    block[2] = c.insertTo
+  }
+
+  if (currentLength > block[0] || nextLength > block[2]) {
+    block[1] = currentLength
+    block[3] = nextLength
+    unchanged.push([...block])
+  }
+
+  return unchanged.map(u => { return {currentFrom: u[0], currentTo: u[1], nextFrom: u[2], nextTo: u[3]} })
+}
+
 export const changeSet = (eq, current, next) => {
   const changes = []
 
@@ -92,29 +115,6 @@ export const applyChangeSet = (remove, insert, list, nextList, changeSet) => {
   }
 
   return list
-}
-
-const getUnchanged = (changeSet, currentLength, nextLength) => {
-  const unchanged = []
-  const block = [0, 0, 0, 0]
-  for (let c of changeSet) {
-    if (c.deleteFrom > block[0] || c.insertFrom > block[2]) {
-      block[1] = c.deleteFrom
-      block[3] = c.insertFrom
-      unchanged.push([...block])
-    }
-
-    block[0] = c.deleteTo
-    block[2] = c.insertTo
-  }
-
-  if (currentLength > block[0] || nextLength > block[2]) {
-    block[1] = currentLength
-    block[3] = nextLength
-    unchanged.push([...block])
-  }
-
-  return unchanged.map(u => { return {currentFrom: u[0], currentTo: u[1], nextFrom: u[2], nextTo: u[3]} })
 }
 
 export const forEachUnchanged = (current, next, changeSet, proc) => {
