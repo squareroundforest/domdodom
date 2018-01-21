@@ -13,7 +13,10 @@ const bytesOf = int => (int & 255) === int
   : bytesOf(int >>> 8).concat(int & 255)
 
 const addByte = (int, b) => mul32((int ^ b), fnvPrime32)
-const hashSum = (int1, int2) => bytesOf(int2).reduce(addByte, int1)
+
+const hashSum = (...ints) => ints.reduce(
+  (h, int) => bytesOf(int).reduce(addByte, h)
+)
 
 export const series = seed => {
   const keys = {}
@@ -28,7 +31,7 @@ export const series = seed => {
     return h
   }
 
-  return (key, ...hashes) => [keyHash(key), ...hashes].reduce(hashSum)
+  return (key, ...hashes) => hashSum(keyHash(key), ...hashes)
 }
 
 export default series(0)

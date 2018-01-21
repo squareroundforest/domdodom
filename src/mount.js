@@ -1,4 +1,4 @@
-/* global Node */
+/* global Node document */
 import {nodeType} from './define'
 import {filterSupportedDOMNodes, syncDOMNode, syncDOMNodes} from './dom'
 import {applyDiff} from './diff'
@@ -35,9 +35,12 @@ const resolveContentHTML = nodes => nodes.reduce(
 
 const mountEq = (domNode, node) => {
   if (node instanceof Node) {
-    return node.nodeType === domNode.nodeType &&
-      (node.nodeType !== Node.ELEMENT_NODE ||
-      node.name === domNode.tagName)
+    return (
+      node.nodeType === domNode.nodeType && (
+        node.nodeType !== Node.ELEMENT_NODE ||
+        node.name === domNode.tagName
+      )
+    )
   }
 
   if (node.type === nodeType.tag) {
@@ -125,7 +128,12 @@ const mountText = (node, domNode) => {
 }
 
 const mountHTML = (node, domNode) => {
-  return syncDOMNodes(domNode.parentNode, [domNode], contentHTMLNodes(node.html), domNode.nextSibling)
+  return syncDOMNodes(
+    domNode.parentNode,
+    [domNode],
+    contentHTMLNodes(node.html),
+    domNode.nextSibling
+  )
 }
 
 const mountNode = (node, domNode) => {
@@ -139,6 +147,4 @@ const mountNode = (node, domNode) => {
   }
 }
 
-export const mount = (node, domNode) => {
-  return mountNode(resolve(node), domNode)
-}
+export const mount = (node, domNode) => mountNode(resolve(node), domNode)

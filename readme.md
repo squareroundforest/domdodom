@@ -18,13 +18,13 @@ original (tag.p) unchanged:
 tag.p({"class": "normal-text"})
 ```
 
-Or:
+or:
 
 ```
 myComponent({data: {"foo": 42}})
 ```
 
-Or:
+or:
 
 ```
 myComponent(["foo", "bar", "baz"])
@@ -39,7 +39,7 @@ new node, too:
 tag.div(anotherTag, "text content", new Date)
 ```
 
-Or:
+or:
 
 ```
 myComponent("line one", tag.br, "line two")
@@ -79,7 +79,7 @@ Children of a tag or component can be anything that are not props.
 "This is inner HTML".
 ```
 
-Or:
+or:
 
 ```
 "This an HTML code example: <em>foo</em>."

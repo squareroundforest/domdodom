@@ -1,3 +1,4 @@
+// TODO: enough to use an array
 const change = (dfrom, dto, ifrom, ito) => {
   return {
     deleteFrom: dfrom,
@@ -58,7 +59,14 @@ const getUnchanged = (changeSet, currentLength, nextLength) => {
     unchanged.push([...block])
   }
 
-  return unchanged.map(u => { return {currentFrom: u[0], currentTo: u[1], nextFrom: u[2], nextTo: u[3]} })
+  return unchanged.map(u => {
+    return {
+      currentFrom: u[0],
+      currentTo: u[1],
+      nextFrom: u[2],
+      nextTo: u[3]
+    }
+  })
 }
 
 export const changeSet = (eq, current, next) => {
@@ -118,6 +126,7 @@ export const applyChangeSet = (remove, insert, list, nextList, changeSet) => {
 }
 
 export const forEachUnchanged = (current, next, changeSet, proc) => {
+  // TODO: simplify, no need for the separate getUnchanged function
   const unchanged = getUnchanged(changeSet, current.length, next.length)
   for (let c of unchanged) {
     for (let i = c.currentFrom; i < c.currentTo; i++) {

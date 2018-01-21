@@ -1,4 +1,4 @@
-/* global document test expect beforeEach */
+/* global test expect beforeEach */
 import {define, tag, render, htmlContent} from '.'
 import {root, checkDOM, initDOM} from './domtest'
 

@@ -50,6 +50,7 @@ export const capturedEq = (prev, next) => {
   const nextNodes = capturedElementsAndText(next.children)
   return (
     prevNodes.every((n, i) => capturedEq(n, nextNodes[i])) &&
+    prev.attributes.length === next.attributes.length &&
     prev.attributes.every(pa =>
       next.attributes.some(na =>
         na.name === pa.name && na.value === pa.value

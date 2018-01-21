@@ -18,9 +18,7 @@ const resolveText = text => {
   return {
     type: nodeType.text,
     text: String(text).trim(),
-    hash: hash('#text'),
-    props: {},
-    children: []
+    hash: hash('#text')
   }
 }
 
@@ -28,9 +26,7 @@ const resolveHTML = spec => {
   return {
     type: nodeType.html,
     html: spec.children[0],
-    hash: hash('#html'),
-    props: {},
-    children: []
+    hash: hash('#html')
   }
 }
 

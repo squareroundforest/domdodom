@@ -6,21 +6,19 @@ const attributesMarkup = props => Object.keys(props).reduce(
   ''
 )
 
-const childrenMarkup = children => children.map(markup).join('')
-
 const tagMarkup = spec => {
   if (spec.def.isVoid) {
     return `<${spec.def.name}${attributesMarkup(spec.props)}>`
   } else {
     return `<${spec.def.name}${attributesMarkup(spec.props)}>` +
-      `${childrenMarkup(spec.children)}` +
+      `${spec.children.map(markup).join('')}` +
       `</${spec.def.name}>`
   }
 }
 
 const componentMarkup = spec => markup(spec.def.component(spec.props, spec.children))
-const htmlMarkup = spec => String(spec.children[0])
 const textMarkup = node => escapeHTML(String(node))
+const htmlMarkup = spec => String(spec.children[0])
 
 export const markup = node => {
   if (!isElement(node)) {

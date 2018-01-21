@@ -16,9 +16,11 @@ const nodeTypeEq = (current, next) => {
 }
 
 const syncAttributes = (current, next) => {
+  const currentAttributes = [...current.attributes]
   const nextAttributes = [...next.attributes]
   const nextNames = nextAttributes.map(a => a.name)
-  Array.from(current.attributes).forEach(a => {
+
+  currentAttributes.forEach(a => {
     if (!nextNames.some(n => n === a.name)) {
       current.removeAttribute(a.name)
     }
@@ -38,7 +40,11 @@ const syncTextNode = (current, next) => {
   }
 }
 
-export const filterSupportedDOMNodes = nodes => nodes.filter(n => supportedNodeTypes.some(nt => nt === n.nodeType))
+export const filterSupportedDOMNodes = nodes => nodes.filter(
+  n => supportedNodeTypes.some(
+    nt => nt === n.nodeType
+  )
+)
 
 export const syncDOMNodes = (parent, nodes, nextNodes, before) => {
   const remove = (nodes, from, to) => {

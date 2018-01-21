@@ -1,4 +1,4 @@
-/* global beforeEach test expect */
+/* global beforeEach test expect document */
 import {root, initDOM, captureDOM, capturedEq} from './domtest'
 import {render, htmlContent, tag} from '.'
 
@@ -113,6 +113,18 @@ test('only required diff, html', () => {
   expect(capturedEq(before, after)).toBe(false)
   before.children.splice(1, 1)
   after.children.splice(1, 1)
+  expect(capturedEq(before, after)).toBe(true)
+})
+
+test('html, only attribute change', () => {
+  const initial = htmlContent(`<ul id="test"><li>foo</li><li>bar</li><li>baz</li></ul>`)
+  const update = htmlContent(`<ul id="test"><li>foo</li><li style="display: none">bar</li><li>baz</li></ul>`)
+  initDOM(tag.div(initial))
+  const before = captureDOM(document.getElementById('test'))
+  render(update, document.getElementById('test'))
+  const after = captureDOM(document.getElementById('test'))
+  expect(capturedEq(before, after)).toBe(false)
+  after.children[1].attributes.length = 0
   expect(capturedEq(before, after)).toBe(true)
 })
 
