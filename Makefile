@@ -1,5 +1,6 @@
 SOURCE = $(shell find src -name "*.js")
 CONFIG = $(shell ls *.js *.json)
+BROWSER ?= firefox
 
 build: server
 
@@ -22,6 +23,12 @@ server: client dist/index.js
 
 run: server
 	@node dist --pretty
+
+cover:
+	npx --no-install jest --silent --coverage
+
+show-cover: cover
+	$(BROWSER) coverage/lcov-report/index.html
 
 check: $(SOURCE) $(CONFIG)
 	npx --no-install jest --silent

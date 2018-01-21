@@ -38,9 +38,6 @@ const findNoMatch = (eq, current, next) => {
   return i
 }
 
-// eq doesn't need to be commutative
-// current and next must be an array
-// next or its items don't need to be of the same type as list
 export const changeSet = (eq, current, next) => {
   const changes = []
 
@@ -80,13 +77,9 @@ export const changeSet = (eq, current, next) => {
   }
 }
 
-// remove and insert are allowed to mutate the list, their result is returned
-// nextList must be an array
-// nextList or its items don't need to be of the same type as list
 export const applyChangeSet = (remove, insert, list, nextList, changeSet) => {
-  let c
   let offset = 0
-  for (c of changeSet) {
+  for (let c of changeSet) {
     if (c.deleteFrom !== c.deleteTo) {
       list = remove(list, c.deleteFrom + offset, c.deleteTo + offset)
       offset += c.deleteFrom - c.deleteTo
@@ -101,22 +94,38 @@ export const applyChangeSet = (remove, insert, list, nextList, changeSet) => {
   return list
 }
 
-// current and next must be iterable
-export const getUnchanged = (current, next, changeSet) => {
-  current = [...current]
-  next = [...next]
-  changeSet.forEach(c => {
-    current.splice(c.deleteFrom, c.deleteTo - c.deleteFrom)
-    next.splice(c.insertFrom, c.insertTo - c.insertFrom)
-  })
+const getUnchanged = (changeSet, currentLength, nextLength) => {
+  const unchanged = []
+  const block = [0, 0, 0, 0]
+  for (let c of changeSet) {
+    if (c.deleteFrom > block[0] || c.insertFrom > block[2]) {
+      block[1] = c.deleteFrom
+      block[3] = c.insertFrom
+      unchanged.push([...block])
+    }
 
-  return {current: current, next: next}
+    block[0] = c.deleteTo
+    block[2] = c.insertTo
+  }
+
+  if (currentLength > block[0] || nextLength > block[2]) {
+    block[1] = currentLength
+    block[3] = nextLength
+    unchanged.push([...block])
+  }
+
+  return unchanged.map(u => { return {currentFrom: u[0], currentTo: u[1], nextFrom: u[2], nextTo: u[3]} })
 }
 
-// eq doesn't need to be commutative
-// remove and insert are allowed to mutate the list, their result is returned
-// list and nextList must be an array
-// nextList or its items don't need to be of the same type as list
+export const forEachUnchanged = (current, next, changeSet, proc) => {
+  const unchanged = getUnchanged(changeSet, current.length, next.length)
+  for (let c of unchanged) {
+    for (let i = c.currentFrom; i < c.currentTo; i++) {
+      proc(current[i], next[i + c.nextFrom - c.currentFrom])
+    }
+  }
+}
+
 export const applyDiff = (eq, remove, insert, list, nextList) => {
   const c = changeSet(eq, list, nextList)
   return applyChangeSet(remove, insert, list, nextList, c)

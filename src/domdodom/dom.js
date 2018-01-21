@@ -1,5 +1,5 @@
 /* global Node */
-import {changeSet, getUnchanged, applyChangeSet} from './diff'
+import {changeSet, forEachUnchanged, applyChangeSet} from './diff'
 
 const supportedNodeTypes = typeof Node !== 'undefined' ? [Node.ELEMENT_NODE, Node.TEXT_NODE] : []
 
@@ -55,8 +55,7 @@ export const syncDOMNodes = (parent, nodes, nextNodes) => {
   nodes = filterSupportedDOMNodes([...nodes])
   nextNodes = filterSupportedDOMNodes([...nextNodes])
   const changedType = changeSet(nodeTypeEq, nodes, nextNodes)
-  const unchanged = getUnchanged(nodes, nextNodes, changedType)
-  unchanged.current.forEach((n, i) => syncDOMNode(n, unchanged.next[i]))
+  forEachUnchanged(nodes, nextNodes, changedType, syncDOMNode)
   applyChangeSet(remove, insert, nodes, nextNodes, changedType)
 }
 

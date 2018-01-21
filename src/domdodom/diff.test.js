@@ -1,5 +1,5 @@
 /* global test expect */
-import {changeSet, applyChangeSet} from './diff'
+import {changeSet, applyChangeSet, forEachUnchanged, applyDiff} from './diff'
 
 const remove = (a, from, to) => {
   a.splice(from, to - from)
@@ -34,7 +34,7 @@ testChangeSet('prepend, insert', [1, 2, 3], [-1, 0, 1, 2, 2.3, 2.6, 3], [[0, 0, 
 testChangeSet('prepend, append', [1, 2, 3], [-1, 0, 1, 2, 3, 4, 5], [[0, 0, 0, 2], [3, 3, 5, 7]])
 testChangeSet('insert, append', [1, 2, 3], [1, 2, 2.3, 2.6, 3, 4, 5], [[2, 2, 2, 4], [3, 3, 5, 7]])
 testChangeSet('prepend, insert, append', [1, 2, 3], [-1, 0, 1, 2, 2.3, 2.6, 3, 4, 5],
-    [[0, 0, 0, 2], [2, 2, 4, 6], [3, 3, 7, 9]])
+  [[0, 0, 0, 2], [2, 2, 4, 6], [3, 3, 7, 9]])
 testChangeSet('remove start', [-1, 0, 1, 2, 3], [1, 2, 3], [[0, 2, 0, 0]])
 testChangeSet('remove middle', [1, 1.3, 1.6, 2, 3], [1, 2, 3], [[1, 3, 1, 1]])
 testChangeSet('remove end', [1, 2, 3, 4, 5], [1, 2, 3], [[3, 5, 3, 3]])
@@ -42,7 +42,7 @@ testChangeSet('remove start, middle', [-1, 0, 1, 1.3, 1.6, 2, 3], [1, 2, 3], [[0
 testChangeSet('remove start, end', [-1, 0, 1, 2, 3, 4, 5], [1, 2, 3], [[0, 2, 0, 0], [5, 7, 3, 3]])
 testChangeSet('remove middle, end', [1, 1.3, 1.6, 2, 3, 4, 5], [1, 2, 3], [[1, 3, 1, 1], [5, 7, 3, 3]])
 testChangeSet('remove start, middle, end', [-1, 0, 1, 1.3, 1.6, 2, 3, 4, 5], [1, 2, 3],
-    [[0, 2, 0, 0], [3, 5, 1, 1], [7, 9, 3, 3]])
+  [[0, 2, 0, 0], [3, 5, 1, 1], [7, 9, 3, 3]])
 testChangeSet('remove start, prepend', [-1, 0, 1, 2, 3], [-0.5, 1, 2, 3], [[0, 2, 0, 1]])
 testChangeSet('remove start, insert', [-1, 0, 1, 2, 3], [1, 2, 2.5, 3], [[0, 2, 0, 0], [4, 4, 2, 3]])
 testChangeSet('remove start, append', [-1, 0, 1, 2, 3], [1, 2, 3, 4], [[0, 2, 0, 0], [5, 5, 3, 4]])
@@ -54,7 +54,7 @@ testChangeSet('remove end, prepend', [1, 2, 3, 4, 5], [0, 1, 2, 3], [[0, 0, 0, 1
 testChangeSet('remove end, insert', [1, 2, 3, 4, 5], [1, 2, 2.5, 3], [[2, 2, 2, 3], [3, 5, 4, 4]])
 testChangeSet('remove end, append', [1, 2, 3, 4, 5], [1, 2, 3, 3.5], [[3, 5, 3, 4]])
 testChangeSet('change everywhere', [1, 2, 3, 4, 5, 6, 7, 8, 9, 0], [-1.5, 3, 4, -5.5, 7, 8, -9.5],
-    [[0, 2, 0, 1], [4, 6, 3, 4], [8, 10, 6, 7]])
+  [[0, 2, 0, 1], [4, 6, 3, 4], [8, 10, 6, 7]])
 
 testApply('both empty', [], [])
 testApply('current empty', [], [1, 2, 3])
@@ -85,3 +85,38 @@ testApply('remove end, prepend', [1, 2, 3, 4, 5], [0, 1, 2, 3])
 testApply('remove end, insert', [1, 2, 3, 4, 5], [1, 2, 2.5, 3])
 testApply('remove end, append', [1, 2, 3, 4, 5], [1, 2, 3, 3.5])
 testApply('change everywhere', [1, 2, 3, 4, 5, 6, 7, 8, 9, 0], [-1.5, 3, 4, -5.5, 7, 8, -9.5])
+
+test(
+  'for each unchanged',
+  () => {
+    const items = []
+    forEachUnchanged(
+      [1, 2, 3, 4, 5],
+      [-1, 0, 1, 3, 5, 6, 7],
+      changeSet(Object.is, [1, 2, 3, 4, 5], [-1, 0, 1, 3, 5, 6, 7]),
+      (current, next) => items.push([current, next])
+    )
+    expect(items).toEqual([[1, 1], [3, 3], [5, 5]])
+  }
+)
+
+test(
+  'for each unchanged, with tail',
+  () => {
+    const items = []
+    forEachUnchanged(
+      [1, 2, 3, 4, 5],
+      [-1, 0, 1, 3, 5],
+      changeSet(Object.is, [1, 2, 3, 4, 5], [-1, 0, 1, 3, 5]),
+      (current, next) => items.push([current, next])
+    )
+    expect(items).toEqual([[1, 1], [3, 3], [5, 5]])
+  }
+)
+
+test(
+  'apply diff',
+  () => expect(
+    applyDiff(Object.is, remove, insert, [1, 2, 3, 4, 5], [-1, 0, 1, 3, 5, 6, 7])
+  ).toEqual([-1, 0, 1, 3, 5, 6, 7])
+)
