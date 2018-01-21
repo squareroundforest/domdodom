@@ -39,36 +39,6 @@ const findNoMatch = (eq, current, next) => {
   return i
 }
 
-const getUnchanged = (changeSet, currentLength, nextLength) => {
-  const unchanged = []
-  const block = [0, 0, 0, 0]
-  for (let c of changeSet) {
-    if (c.deleteFrom > block[0] || c.insertFrom > block[2]) {
-      block[1] = c.deleteFrom
-      block[3] = c.insertFrom
-      unchanged.push([...block])
-    }
-
-    block[0] = c.deleteTo
-    block[2] = c.insertTo
-  }
-
-  if (currentLength > block[0] || nextLength > block[2]) {
-    block[1] = currentLength
-    block[3] = nextLength
-    unchanged.push([...block])
-  }
-
-  return unchanged.map(u => {
-    return {
-      currentFrom: u[0],
-      currentTo: u[1],
-      nextFrom: u[2],
-      nextTo: u[3]
-    }
-  })
-}
-
 export const changeSet = (eq, current, next) => {
   const changes = []
 
@@ -108,6 +78,27 @@ export const changeSet = (eq, current, next) => {
   }
 }
 
+export const forEachUnchanged = (current, next, changeSet, proc) => {
+  let currentFrom = 0
+  let nextFrom = 0
+  for (let c of changeSet) {
+    if (c.deleteFrom > currentFrom || c.insertFrom > nextFrom) {
+      for (let i = currentFrom; i < c.deleteFrom; i++) {
+        proc(current[i], next[i + nextFrom - currentFrom])
+      }
+    }
+
+    currentFrom = c.deleteTo
+    nextFrom = c.insertTo
+  }
+
+  if (current.length > currentFrom || next.length > nextFrom) {
+    for (let i = currentFrom; i < current.length; i++) {
+      proc(current[i], next[i + nextFrom - currentFrom])
+    }
+  }
+}
+
 export const applyChangeSet = (remove, insert, list, nextList, changeSet) => {
   let offset = 0
   for (let c of changeSet) {
@@ -123,16 +114,6 @@ export const applyChangeSet = (remove, insert, list, nextList, changeSet) => {
   }
 
   return list
-}
-
-export const forEachUnchanged = (current, next, changeSet, proc) => {
-  // TODO: simplify, no need for the separate getUnchanged function
-  const unchanged = getUnchanged(changeSet, current.length, next.length)
-  for (let c of unchanged) {
-    for (let i = c.currentFrom; i < c.currentTo; i++) {
-      proc(current[i], next[i + c.nextFrom - c.currentFrom])
-    }
-  }
 }
 
 export const applyDiff = (eq, remove, insert, list, nextList) => {
