@@ -1,4 +1,5 @@
 /* global test expect */
+
 import {define, htmlContent, markup, markupDoc, tag} from '.'
 
 test('element', () =>

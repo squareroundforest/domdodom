@@ -1,8 +1,19 @@
-/* global Node document */
+/* global Node */
+
 import {nodeType} from './define'
-import {filterSupportedDOMNodes, syncDOMNode, syncDOMRange, htmlToDOMNodes, applyProps} from './dom'
 import {sync} from './sync'
 import {resolve} from './resolve'
+
+import {
+  filterSupportedDOMNodes,
+  syncDOMNode,
+  syncDOMRange,
+  htmlToDOMNodes,
+  applyProps,
+  domSyncEq,
+  syncInsert,
+  syncRemove
+} from './dom'
 
 const resolveContentHTML = nodes => nodes.reduce(
   (nodes, current) => nodes.concat(
@@ -12,6 +23,21 @@ const resolveContentHTML = nodes => nodes.reduce(
   ),
   []
 )
+
+const mountSyncEq = (from, to) => {
+  if (from instanceof Node) {
+    return domSyncEq(from, to)
+  }
+
+  if (from.type === nodeType.tag) {
+    return (
+      to.nodeType === Node.ELEMENT_NODE &&
+      from.name === to.tagName
+    )
+  }
+
+  return true
+}
 
 const nodeToDOMNode = node => {
   if (node instanceof Node) {
@@ -26,43 +52,9 @@ const nodeToDOMNode = node => {
 }
 
 const mountChildren = (node, children) => {
-  const eq = (from, to) => {
-    if (from instanceof Node) {
-      return (
-        from.nodeType === to.nodeType && (
-          from.nodeType !== Node.ELEMENT_NODE ||
-          from.name === to.tagName
-        )
-      )
-    }
-
-    if (from.type === nodeType.tag) {
-      return (
-        to.nodeType === Node.ELEMENT_NODE &&
-        from.name === to.tagName
-      )
-    }
-
-    return true
-  }
-
-  const insert = (nodes, at, insertNodes) => {
-    const atNode = nodes.length > at ? nodes[at] : null
-    const domNodes = insertNodes.map(nodeToDOMNode)
-    domNodes.forEach(n => node.insertBefore(n, atNode))
-    nodes.splice(at, 0, ...domNodes)
-    return nodes
-  }
-
-  const remove = (nodes, start, end) => {
-    nodes.slice(start, end).forEach(n => node.removeChild(n))
-    nodes.splice(start, end - start)
-    return nodes
-  }
-
   children = resolveContentHTML(children)
   const domChildren = filterSupportedDOMNodes([...node.childNodes])
-  sync(eq, insert, remove, children, domChildren)
+  sync(mountSyncEq, syncInsert(node, null, nodeToDOMNode), syncRemove, children, domChildren)
   children.forEach((c, i) => mountNode(c, domChildren[i]))
 }
 

@@ -1,4 +1,5 @@
 /* global test expect */
+
 import {define, tag, htmlContent} from '.'
 
 test('extend sealed', () => expect(() => htmlContent('foo')({style: 'background: red'})).toThrow(/sealed/))

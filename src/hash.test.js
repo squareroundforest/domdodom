@@ -1,4 +1,5 @@
 /* global describe test expect */
+
 import {series} from './hash'
 
 describe('hash', () => {

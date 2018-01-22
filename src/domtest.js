@@ -1,4 +1,5 @@
-/* global expect document Node */
+/* global expect Node */
+
 import {markup} from '.'
 
 export let root

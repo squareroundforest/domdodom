@@ -1,4 +1,5 @@
 /* global test expect */
+
 import {getChanges, syncChanges, forEachUnchanged, sync} from './sync'
 
 const insert = (a, at, items) => {

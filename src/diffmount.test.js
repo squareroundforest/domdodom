@@ -1,4 +1,5 @@
-/* global beforeEach test expect document */
+/* global beforeEach test expect */
+
 import {root, initDOM, captureDOM, capturedEq} from './domtest'
 import {render, htmlContent, tag} from '.'
 

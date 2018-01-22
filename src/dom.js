@@ -1,4 +1,5 @@
 /* global Node */
+
 import {getChanges, forEachUnchanged, syncChanges} from './sync'
 
 // TODO: support for canvas and other media
@@ -35,6 +36,32 @@ const syncTextNode = (from, to) => {
   }
 }
 
+export const domSyncEq = (from, to) => {
+  if (from.nodeType !== to.nodeType) {
+    return false
+  }
+
+  if (from.nodeType === Node.ELEMENT_NODE) {
+    return from.tagName === to.tagName
+  }
+
+  return true
+}
+
+export const syncInsert = (parent, before, resolveNode) => (nodes, at, insertNodes) => {
+  const atNode = nodes.length > at ? nodes[at] : before
+  const domNodes = insertNodes.map(resolveNode)
+  domNodes.forEach(n => parent.insertBefore(n, atNode))
+  nodes.splice(at, 0, ...domNodes)
+  return nodes
+}
+
+export const syncRemove = (nodes, start, end) => {
+  nodes.slice(start, end).forEach(n => n.parentNode.removeChild(n))
+  nodes.splice(start, end - start)
+  return nodes
+}
+
 export const applyProps = (domElement, props) => {
   [...domElement.attributes].forEach(a => {
     if (!(a.name in props)) {
@@ -59,36 +86,11 @@ export const filterSupportedDOMNodes = nodes => nodes.filter(
 )
 
 export const syncDOMRange = (parent, from, to, before) => {
-  const eq = (from, to) => {
-    if (from.nodeType !== to.nodeType) {
-      return false
-    }
-
-    if (from.nodeType === Node.ELEMENT_NODE) {
-      return from.tagName === to.tagName
-    }
-
-    return true
-  }
-
-  const insert = (nodes, at, insertNodes) => {
-    const atNode = nodes.length > at ? nodes[at] : before
-    insertNodes.forEach(n => parent.insertBefore(n, atNode))
-    nodes.splice(at, 0, ...insertNodes)
-    return nodes
-  }
-
-  const remove = (nodes, start, end) => {
-    nodes.slice(start, end).forEach(n => parent.removeChild(n))
-    nodes.splice(start, end - start)
-    return nodes
-  }
-
   from = filterSupportedDOMNodes([...from])
   to = filterSupportedDOMNodes([...to])
-  const changes = getChanges(eq, from, to)
+  const changes = getChanges(domSyncEq, from, to)
   forEachUnchanged(from, to, changes, syncDOMNode)
-  syncChanges(insert, remove, from, to, changes)
+  syncChanges(syncInsert(parent, before, x => x), syncRemove, from, to, changes)
 }
 
 export const syncDOMNode = (from, to) => {

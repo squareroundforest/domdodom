@@ -1,4 +1,3 @@
-/* global document */
 import {tag, render, htmlContent} from '../../..'
 
 const app = tag.div(
