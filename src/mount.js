@@ -1,7 +1,7 @@
 /* global Node document */
 import {nodeType} from './define'
 import {filterSupportedDOMNodes, syncDOMNode, syncDOMRange, htmlToDOMNodes, applyProps} from './dom'
-import {applyDiff} from './diff'
+import {sync} from './sync'
 import {resolve} from './resolve'
 
 const resolveContentHTML = nodes => nodes.reduce(
@@ -26,43 +26,43 @@ const nodeToDOMNode = node => {
 }
 
 const mountChildren = (node, children) => {
-  const eq = (domNode, node) => {
-    if (node instanceof Node) {
+  const eq = (from, to) => {
+    if (from instanceof Node) {
       return (
-        node.nodeType === domNode.nodeType && (
-          node.nodeType !== Node.ELEMENT_NODE ||
-          node.name === domNode.tagName
+        from.nodeType === to.nodeType && (
+          from.nodeType !== Node.ELEMENT_NODE ||
+          from.name === to.tagName
         )
       )
     }
 
-    if (node.type === nodeType.tag) {
+    if (from.type === nodeType.tag) {
       return (
-        domNode.nodeType === Node.ELEMENT_NODE &&
-        node.name === domNode.tagName
+        to.nodeType === Node.ELEMENT_NODE &&
+        from.name === to.tagName
       )
     }
 
     return true
   }
 
-  const remove = (list, from, to) => {
-    list.slice(from, to).forEach(n => node.removeChild(n))
-    list.splice(from, to - from)
-    return list
+  const insert = (nodes, at, insertNodes) => {
+    const atNode = nodes.length > at ? nodes[at] : null
+    const domNodes = insertNodes.map(nodeToDOMNode)
+    domNodes.forEach(n => node.insertBefore(n, atNode))
+    nodes.splice(at, 0, ...domNodes)
+    return nodes
   }
 
-  const insert = (list, at, nodes) => {
-    const atNode = list.length > at ? list[at] : null
-    const domNodes = nodes.map(nodeToDOMNode)
-    domNodes.forEach(n => node.insertBefore(n, atNode))
-    list.splice(at, 0, ...domNodes)
-    return list
+  const remove = (nodes, start, end) => {
+    nodes.slice(start, end).forEach(n => node.removeChild(n))
+    nodes.splice(start, end - start)
+    return nodes
   }
 
   children = resolveContentHTML(children)
   const domChildren = filterSupportedDOMNodes([...node.childNodes])
-  applyDiff(eq, remove, insert, domChildren, children)
+  sync(eq, insert, remove, children, domChildren)
   children.forEach((c, i) => mountNode(c, domChildren[i]))
 }
 
@@ -101,15 +101,15 @@ const mountText = (node, domNode) => {
 const mountHTML = (node, domNode) => {
   return syncDOMRange(
     domNode.parentNode,
-    [domNode],
     htmlToDOMNodes(node.html),
+    [domNode],
     domNode.nextSibling
   )
 }
 
 const mountNode = (node, domNode) => {
   if (node instanceof Node) {
-    syncDOMNode(domNode, node)
+    syncDOMNode(node, domNode)
     return
   }
 

@@ -33,6 +33,9 @@ showcover: cover
 check: $(SOURCE) $(CONFIG)
 	npx --no-install jest --silent
 
+checkwatch: $(SOURCE) $(CONFIG)
+	npx --no-install jest --watch
+
 check-lint: $(SOURCE) $(CONFIG)
 	@npx --no-install standard $(SOURCE) *.js
 

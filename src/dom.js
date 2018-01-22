@@ -1,33 +1,37 @@
 /* global Node */
-import {changeSet, forEachUnchanged, applyChangeSet} from './diff'
+import {getChanges, forEachUnchanged, syncChanges} from './sync'
 
-const supportedNodeTypes = typeof Node !== 'undefined' ? [Node.ELEMENT_NODE, Node.TEXT_NODE] : []
+// TODO: support for canvas and other media
+const supportedNodeTypes = typeof Node !== 'undefined' ? [
+  Node.ELEMENT_NODE,
+  Node.TEXT_NODE
+] : []
 
 // TODO: move to dom
 const tempNode = typeof document !== 'undefined' ? document.createElement('div') : undefined
 
-const syncAttributes = (current, next) => {
-  const currentAttributes = [...current.attributes]
-  const nextAttributes = [...next.attributes]
-  const nextNames = nextAttributes.map(a => a.name)
+const syncAttributes = (from, to) => {
+  const fromAttributes = [...from.attributes]
+  const fromNames = fromAttributes.map(a => a.name)
+  const toAttributes = [...to.attributes]
 
-  currentAttributes.forEach(a => {
-    if (!nextNames.some(n => n === a.name)) {
-      current.removeAttribute(a.name)
+  toAttributes.forEach(a => {
+    if (!fromNames.some(n => n === a.name)) {
+      to.removeAttribute(a.name)
     }
   })
 
-  nextAttributes.forEach(a => current.setAttribute(a.name, a.value))
+  fromAttributes.forEach(a => to.setAttribute(a.name, a.value))
 }
 
-const syncElement = (current, next) => {
-  syncAttributes(current, next)
-  syncDOMRange(current, current.childNodes, next.childNodes, null)
+const syncElement = (from, to) => {
+  syncAttributes(from, to)
+  syncDOMRange(to, from.childNodes, to.childNodes, null)
 }
 
-const syncTextNode = (current, next) => {
-  if (current.textContent !== next.textContent) {
-    current.textContent = next.textContent
+const syncTextNode = (from, to) => {
+  if (from.textContent !== to.textContent) {
+    to.textContent = from.textContent
   }
 }
 
@@ -54,44 +58,44 @@ export const filterSupportedDOMNodes = nodes => nodes.filter(
   )
 )
 
-export const syncDOMRange = (parent, nodes, nextNodes, before) => {
-  const eq = (current, next) => {
-    if (current.nodeType !== next.nodeType) {
+export const syncDOMRange = (parent, from, to, before) => {
+  const eq = (from, to) => {
+    if (from.nodeType !== to.nodeType) {
       return false
     }
 
-    if (current.nodeType === Node.ELEMENT_NODE) {
-      return current.tagName === next.tagName
+    if (from.nodeType === Node.ELEMENT_NODE) {
+      return from.tagName === to.tagName
     }
 
     return true
   }
 
-  const remove = (nodes, from, to) => {
-    nodes.slice(from, to).forEach(n => parent.removeChild(n))
-    nodes.splice(from, to - from)
-    return nodes
-  }
-
-  const insert = (nodes, at, nextNodes) => {
+  const insert = (nodes, at, insertNodes) => {
     const atNode = nodes.length > at ? nodes[at] : before
-    nextNodes.forEach(n => parent.insertBefore(n, atNode))
-    nodes.splice(at, 0, ...nextNodes)
+    insertNodes.forEach(n => parent.insertBefore(n, atNode))
+    nodes.splice(at, 0, ...insertNodes)
     return nodes
   }
 
-  nodes = filterSupportedDOMNodes([...nodes])
-  nextNodes = filterSupportedDOMNodes([...nextNodes])
-  const changedType = changeSet(eq, nodes, nextNodes)
-  forEachUnchanged(nodes, nextNodes, changedType, syncDOMNode)
-  applyChangeSet(remove, insert, nodes, nextNodes, changedType)
+  const remove = (nodes, start, end) => {
+    nodes.slice(start, end).forEach(n => parent.removeChild(n))
+    nodes.splice(start, end - start)
+    return nodes
+  }
+
+  from = filterSupportedDOMNodes([...from])
+  to = filterSupportedDOMNodes([...to])
+  const changes = getChanges(eq, from, to)
+  forEachUnchanged(from, to, changes, syncDOMNode)
+  syncChanges(insert, remove, from, to, changes)
 }
 
-export const syncDOMNode = (current, next) => {
-  if (current.nodeType === Node.ELEMENT_NODE) {
-    syncElement(current, next)
+export const syncDOMNode = (from, to) => {
+  if (from.nodeType === Node.ELEMENT_NODE) {
+    syncElement(from, to)
     return
   }
 
-  syncTextNode(current, next)
+  syncTextNode(from, to)
 }
