@@ -12,7 +12,8 @@ const resolveTag = spec => {
   }
 }
 
-const resolveComponent = spec => resolve(spec.def.component(spec.props, spec.children))
+const resolveComponent = spec =>
+  resolve(spec.def.component(spec.props, spec.children))
 
 const resolveText = text => {
   return {

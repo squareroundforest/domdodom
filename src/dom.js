@@ -8,8 +8,9 @@ const supportedNodeTypes = typeof Node !== 'undefined' ? [
   Node.TEXT_NODE
 ] : []
 
-// TODO: move to dom
-const tempNode = typeof document !== 'undefined' ? document.createElement('div') : undefined
+const tempNode = typeof document !== 'undefined'
+  ? document.createElement('div')
+  : undefined
 
 const syncAttributes = (from, to) => {
   const fromAttributes = [...from.attributes]

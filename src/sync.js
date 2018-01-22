@@ -107,7 +107,5 @@ export const forEachUnchanged = (from, to, changes, proc) => {
   }
 }
 
-export const sync = (eq, insert, remove, from, to) => {
-  const c = getChanges(eq, from, to)
-  return syncChanges(insert, remove, from, to, c)
-}
+export const sync = (eq, insert, remove, from, to) =>
+  syncChanges(insert, remove, from, to, getChanges(eq, from, to))
