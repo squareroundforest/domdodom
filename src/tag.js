@@ -1,6 +1,7 @@
 import {define, defineWithOptions} from "./define"
 
-const tags = "html, head, title, meta, script, body, div, ol, ul, li, span, h1, p, code"
+const tags =
+	"html, head, title, meta, script, body, div, ol, ul, li, span, h1, p, code"
 const voidTags = "br"
 
 export const tag = {}

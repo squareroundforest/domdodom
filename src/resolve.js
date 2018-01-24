@@ -12,7 +12,8 @@ function resolveTag(spec) {
 	}
 }
 
-const resolveComponent = spec => resolve(spec.def.component(spec.props, spec.children))
+const resolveComponent = spec =>
+	resolve(spec.def.component(spec.props, spec.children))
 
 const resolveText = text => ({
 	type: nodeType.text,
@@ -40,6 +41,8 @@ export function resolve(node) {
 		case nodeType.html:
 			return resolveHTML(spec)
 		default:
-			throw new DefinitionError("unsupported element type")
+			throw new DefinitionError(
+				"unsupported element type"
+			)
 	}
 }

@@ -1,6 +1,9 @@
 function propNames(props) {
 	const renamed = {}
-	Object.keys(props).forEach(name => (renamed[name === "className" ? "class" : name] = props[name]))
+	Object.keys(props).forEach(function(name) {
+		const usedName = name === "className" ? "class" : name
+		renamed[usedName] = props[name]
+	})
 
 	return renamed
 }
@@ -26,17 +29,25 @@ function element(spec, ...args) {
 		}
 
 		if (spec.def.sealed) {
-			throw new DefinitionError("sealed element cannot be derived from")
+			throw new DefinitionError(
+				"sealed element cannot be derived from"
+			)
 		}
 
 		const children = getChildren(args)
 		if (spec.def.isVoid && children.length > 0) {
-			throw new DefinitionError("void element cannot have children")
+			throw new DefinitionError(
+				"void element cannot have children"
+			)
 		}
 
 		return element({
 			def: spec.def,
-			props: Object.assign({}, spec.props, ...getProps(args)),
+			props: Object.assign(
+				{},
+				spec.props,
+				...getProps(args)
+			),
 			children: [...spec.children, ...children],
 		})
 	}
@@ -52,21 +63,11 @@ const defineElement = (def, options, ...args) =>
 	})
 
 const defineTag = (name, options, ...args) =>
-	defineElement(
-		{
-			type: nodeType.tag,
-			name,
-		},
-		options,
-		...args
-	)
+	defineElement({type: nodeType.tag, name}, options, ...args)
 
 const defineComponent = (c, options, ...args) =>
 	defineElement(
-		{
-			type: nodeType.component,
-			component: c,
-		},
+		{type: nodeType.component, component: c},
 		options,
 		...args
 	)
@@ -99,14 +100,13 @@ export const define = (d, ...args) => defineWithOptions(d, {}, ...args)
 
 export function htmlContent(html) {
 	if (isElement(html)) {
-		throw new DefinitionError("html element cannot be defined with an element")
+		throw new DefinitionError(
+			"html element cannot be defined with an element"
+		)
 	}
 
 	return defineElement(
-		{
-			type: nodeType.html,
-			sealed: true,
-		},
+		{type: nodeType.html, sealed: true},
 		{},
 		html
 	)

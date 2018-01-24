@@ -20,7 +20,9 @@ test("no diff", function() {
 })
 
 test("no diff, html", function() {
-	const html = htmlContent("<ul id='list'><li>foo</li><li>bar</li><li>baz</li></ul>")
+	const html = htmlContent(
+		"<ul id='list'><li>foo</li><li>bar</li><li>baz</li></ul>"
+	)
 	initDOM(tag.div(html))
 	const before = captureDOM(document.getElementById("list"))
 	render(html, document.getElementById("list"))
@@ -52,39 +54,63 @@ test("only required diff", function() {
 })
 
 test("change element type", function() {
-	const initial = tag.div({id: "test"}, tag.div("foo"), tag.div("bar"), tag.div("baz"))
+	const initial = tag.div(
+		{id: "test"},
+		tag.div("foo"),
+		tag.div("bar"),
+		tag.div("baz")
+	)
 
-	const update = tag.div({id: "test"}, tag.div("foo"), tag.code("bar"), tag.div("baz"))
+	const update = tag.div(
+		{id: "test"},
+		tag.div("foo"),
+		tag.code("bar"),
+		tag.div("baz")
+	)
 
 	initDOM(tag.div(initial))
 	const before = captureDOM(document.getElementById("test"))
 	render(update, document.getElementById("test"))
 	const after = captureDOM(document.getElementById("test"))
 	expect(capturedEq(before, after)).toBe(false)
-	expect(after.children[2].children[0].text).toBe(before.children[2].children[0].text)
+	expect(after.children[2].children[0].text).toBe(
+		before.children[2].children[0].text
+	)
 	before.children.splice(1, 2)
 	after.children.splice(1, 2)
 	expect(capturedEq(before, after)).toBe(true)
 })
 
 test("html, change node type", function() {
-	const initial = htmlContent('<div id="test"><div>foo</div><div>bar</div><div>baz</div></div>')
-	const update = htmlContent('<div id="test"><div>foo</div>bar<div>baz</div></div>')
+	const initial = htmlContent(
+		'<div id="test"><div>foo</div><div>bar</div><div>baz</div></div>'
+	)
+	const update = htmlContent(
+		'<div id="test"><div>foo</div>bar<div>baz</div></div>'
+	)
 	initDOM(tag.div(initial))
 	const before = captureDOM(document.getElementById("test"))
 	render(update, document.getElementById("test"))
 	const after = captureDOM(document.getElementById("test"))
 	expect(capturedEq(before, after)).toBe(false)
-	expect(after.children[1].text).toBe(before.children[1].children[0].text)
-	expect(after.children[2].children[0].text).toBe(before.children[2].children[0].text)
+	expect(after.children[1].text).toBe(
+		before.children[1].children[0].text
+	)
+	expect(after.children[2].children[0].text).toBe(
+		before.children[2].children[0].text
+	)
 	before.children.splice(1, 2)
 	after.children.splice(1, 2)
 	expect(capturedEq(before, after)).toBe(true)
 })
 
 test("only required diff, html", function() {
-	const initial = htmlContent('<ul id="test"><li>foo</li><li>bar</li><li>baz</li></ul>')
-	const update = htmlContent('<ul id="test"><li>foo</li><li>qux</li><li>baz</li></ul>')
+	const initial = htmlContent(
+		'<ul id="test"><li>foo</li><li>bar</li><li>baz</li></ul>'
+	)
+	const update = htmlContent(
+		'<ul id="test"><li>foo</li><li>qux</li><li>baz</li></ul>'
+	)
 	initDOM(tag.div(initial))
 	const before = captureDOM(document.getElementById("test"))
 	render(update, document.getElementById("test"))
@@ -96,7 +122,9 @@ test("only required diff, html", function() {
 })
 
 test("html, only attribute change", function() {
-	const initial = htmlContent('<ul id="test"><li>foo</li><li>bar</li><li>baz</li></ul>')
+	const initial = htmlContent(
+		'<ul id="test"><li>foo</li><li>bar</li><li>baz</li></ul>'
+	)
 	const update = htmlContent(
 		'<ul id="test"><li>foo</li><li style="display: none">bar</li><li>baz</li></ul>'
 	)
@@ -110,7 +138,9 @@ test("html, only attribute change", function() {
 })
 
 test("top level html multiple nodes", function() {
-	const initial = htmlContent('<div id="ref">foo</div><div>bar</div><div>baz</div>')
+	const initial = htmlContent(
+		'<div id="ref">foo</div><div>bar</div><div>baz</div>'
+	)
 	const update = htmlContent("<div>qux</div><div>quux</div>")
 	initDOM(tag.div(initial))
 	const before = captureDOM(root)

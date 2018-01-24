@@ -3,9 +3,15 @@
 import {forEachUnchanged, getChanges, syncChanges} from "./sync"
 
 // TODO: support for canvas and other media
-const supportedNodeTypes = typeof Node === "undefined" ? undefined : [Node.ELEMENT_NODE, Node.TEXT_NODE]
+const supportedNodeTypes =
+	typeof Node === "undefined"
+		? undefined
+		: [Node.ELEMENT_NODE, Node.TEXT_NODE]
 
-const tempNode = typeof document === "undefined" ? undefined : document.createElement("div")
+const tempNode =
+	typeof document === "undefined"
+		? undefined
+		: document.createElement("div")
 
 function syncAttributes(from, to) {
 	const fromAttributes = [...from.attributes]
@@ -54,7 +60,9 @@ export const syncInsert = (parent, before, resolveNode) =>
 	}
 
 export function syncRemove(nodes, start, end) {
-	nodes.slice(start, end).forEach(n => n.parentNode.removeChild(n))
+	nodes
+		.slice(start, end)
+		.forEach(n => n.parentNode.removeChild(n))
 	nodes.splice(start, end - start)
 	return nodes
 }
@@ -66,7 +74,9 @@ export function applyProps(domElement, props) {
 		}
 	})
 
-	Object.keys(props).forEach(name => domElement.setAttribute(name, props[name]))
+	Object.keys(props).forEach(name =>
+		domElement.setAttribute(name, props[name])
+	)
 }
 
 export function htmlToDOMNodes(html) {
@@ -77,14 +87,22 @@ export function htmlToDOMNodes(html) {
 }
 
 export const filterSupportedDOMNodes = nodes =>
-	nodes.filter(n => supportedNodeTypes.some(nt => nt === n.nodeType))
+	nodes.filter(n =>
+		supportedNodeTypes.some(nt => nt === n.nodeType)
+	)
 
 export function syncRange(parent, from, to, before) {
 	const fromSupported = filterSupportedDOMNodes([...from])
 	const toSupported = filterSupportedDOMNodes([...to])
 	const changes = getChanges(syncEq, fromSupported, toSupported)
 	forEachUnchanged(fromSupported, toSupported, changes, syncNode)
-	syncChanges(syncInsert(parent, before, x => x), syncRemove, fromSupported, toSupported, changes)
+	syncChanges(
+		syncInsert(parent, before, x => x),
+		syncRemove,
+		fromSupported,
+		toSupported,
+		changes
+	)
 }
 
 export function syncNode(from, to) {

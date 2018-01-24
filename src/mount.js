@@ -15,14 +15,16 @@ import {nodeType} from "./define"
 import {resolve} from "./resolve"
 import {sync} from "./sync"
 
-const resolveContentHTML = nodes =>
-	nodes.reduce(
-		(nodes, current) =>
-			nodes.concat(
-				current.type === nodeType.html ? htmlToDOMNodes(current.html) : current
-			),
+function resolveContentHTML(nodes) {
+	const domIfHTML = current =>
+		current.type === nodeType.html
+			? htmlToDOMNodes(current.html)
+			: current
+	return nodes.reduce(
+		(nodes, current) => nodes.concat(domIfHTML(current)),
 		[]
 	)
+}
 
 function mountSyncEq(from, to) {
 	if (from instanceof Node) {
@@ -30,7 +32,10 @@ function mountSyncEq(from, to) {
 	}
 
 	if (from.type === nodeType.tag) {
-		return to.nodeType === Node.ELEMENT_NODE && from.name === to.tagName
+		return (
+			to.nodeType === Node.ELEMENT_NODE &&
+			from.name === to.tagName
+		)
 	}
 
 	return true
@@ -50,14 +55,23 @@ function nodeToDOMNode(node) {
 
 function mountChildren(node, children) {
 	const resolvedChildren = resolveContentHTML(children)
-	const domChildren = filterSupportedDOMNodes([...node.childNodes])
-	sync(mountSyncEq, syncInsert(node, null, nodeToDOMNode), syncRemove, resolvedChildren, domChildren)
+	const domChildren = filterSupportedDOMNodes([
+		...node.childNodes,
+	])
+	sync(
+		mountSyncEq,
+		syncInsert(node, null, nodeToDOMNode),
+		syncRemove,
+		resolvedChildren,
+		domChildren
+	)
 	resolvedChildren.forEach((c, i) => mountNode(c, domChildren[i]))
 }
 
 function mountTag(spec, domNode) {
 	const nextDomNode =
-		domNode.nodeType !== Node.ELEMENT_NODE || domNode.tagName !== spec.name
+		domNode.nodeType !== Node.ELEMENT_NODE ||
+		domNode.tagName !== spec.name
 			? document.createElement(spec.name)
 			: domNode
 
@@ -86,7 +100,12 @@ function mountText(node, domNode) {
 }
 
 const mountHTML = (node, domNode) =>
-	syncRange(domNode.parentNode, htmlToDOMNodes(node.html), [domNode], domNode.nextSibling)
+	syncRange(
+		domNode.parentNode,
+		htmlToDOMNodes(node.html),
+		[domNode],
+		domNode.nextSibling
+	)
 
 function mountNode(node, domNode) {
 	if (node instanceof Node) {
@@ -104,4 +123,5 @@ function mountNode(node, domNode) {
 	}
 }
 
-export const mount = (node, domNode) => mountNode(resolve(node), domNode)
+export const mount = (node, domNode) =>
+	mountNode(resolve(node), domNode)

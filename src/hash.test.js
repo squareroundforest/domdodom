@@ -3,8 +3,10 @@
 import {series} from "./hash"
 
 describe("hash", function() {
-	test("initial seed", () => expect(series(0)("foo")).toBe(84696351))
-	test("large seed", () => expect(series(0x10203)("foo")).toBe(1456420779))
+	test("initial seed", () =>
+		expect(series(0)("foo")).toBe(84696351))
+	test("large seed", () =>
+		expect(series(0x10203)("foo")).toBe(1456420779))
 	test("same", function() {
 		const hash = series(0)
 		const h1 = hash("foo")

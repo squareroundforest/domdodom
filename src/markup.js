@@ -1,15 +1,22 @@
 import {DefinitionError, inspect, isElement, nodeType} from "./define"
-import {attributeName, escapeAttribute, escapeHTML} from "./html"
+import {attributeName, escapeAttributeValue, escapeHTML} from "./html"
 
 const attributesMarkup = props =>
 	Object.keys(props).reduce(
-		(s, name) => `${s} ${attributeName(name)}="${escapeAttribute(String(props[name]))}"`,
+		(m, name) =>
+			`${m} ${attributeName(
+				name
+			)}="${escapeAttributeValue(
+				String(props[name])
+			)}"`,
 		""
 	)
 
 function tagMarkup(spec) {
 	if (spec.def.isVoid) {
-		return `<${spec.def.name}${attributesMarkup(spec.props)}>`
+		return `<${spec.def.name}${attributesMarkup(
+			spec.props
+		)}>`
 	}
 	return (
 		`<${spec.def.name}${attributesMarkup(spec.props)}>` +
@@ -18,9 +25,10 @@ function tagMarkup(spec) {
 	)
 }
 
-const componentMarkup = spec => markup(spec.def.component(spec.props, spec.children))
 const textMarkup = node => escapeHTML(String(node))
 const htmlMarkup = spec => String(spec.children[0])
+const componentMarkup = spec =>
+	markup(spec.def.component(spec.props, spec.children))
 
 export function markup(node) {
 	if (!isElement(node)) {
@@ -36,8 +44,11 @@ export function markup(node) {
 		case nodeType.html:
 			return htmlMarkup(spec)
 		default:
-			throw new DefinitionError("unsupported element type")
+			throw new DefinitionError(
+				"unsupported element type"
+			)
 	}
 }
 
-export const markupDoc = (node, type) => `<!doctype ${type || "html"}>${markup(node)}`
+export const markupDoc = (node, type) =>
+	`<!doctype ${type || "html"}>${markup(node)}`

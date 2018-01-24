@@ -47,7 +47,7 @@ prettieroptions = --no-config \
 		--arrow-parens avoid \
 		--no-bracket-spacing \
 		--tab-width 8 \
-		--print-width 108 \
+		--print-width 72 \
 		--no-semi \
 		--trailing-comma es5 \
 		--use-tabs

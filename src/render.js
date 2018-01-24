@@ -29,7 +29,9 @@ export function render(view, ref) {
 	const isItANode = refSet && ref instanceof Node
 
 	if (refSet && !isItARef && !isItANode) {
-		throw new RenderError("reference must be a render reference or a DOM node")
+		throw new RenderError(
+			"reference must be a render reference or a DOM node"
+		)
 	}
 
 	// using the body, probably:

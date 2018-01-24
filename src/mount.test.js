@@ -54,14 +54,22 @@ test("html", function() {
 })
 
 test("html as child", function() {
-	const div = tag.div(tag.p("foo"), htmlContent("<p>bar</p><p>baz</p>"), tag.p("qux"))
+	const div = tag.div(
+		tag.p("foo"),
+		htmlContent("<p>bar</p><p>baz</p>"),
+		tag.p("qux")
+	)
 
 	render(div, root)
 	checkDOM(div)
 })
 
 test("html as child, to existing", function() {
-	const div = tag.div(tag.p("foo"), htmlContent("<p>bar</p><p>baz</p>"), tag.p("qux"))
+	const div = tag.div(
+		tag.p("foo"),
+		htmlContent("<p>bar</p><p>baz</p>"),
+		tag.p("qux")
+	)
 
 	initDOM(div)
 	render(div, root)
@@ -69,23 +77,39 @@ test("html as child, to existing", function() {
 })
 
 test("html content, change node type", function() {
-	initDOM(tag.div(htmlContent("<div><p>foo</p><p>bar</p><p>baz</p></div>")))
-	const div = tag.div(htmlContent("<div><p>foo</p>bar<p>baz</p></div>"))
+	initDOM(
+		tag.div(
+			htmlContent(
+				"<div><p>foo</p><p>bar</p><p>baz</p></div>"
+			)
+		)
+	)
+	const div = tag.div(
+		htmlContent("<div><p>foo</p>bar<p>baz</p></div>")
+	)
 	render(div, root)
 	checkDOM(div)
 })
 
 test("html content, changing attributes", function() {
 	initDOM(
-		tag.div(htmlContent('<div><p>foo</p><p class="pretty" style="red">bar</p><p>baz</p></div>'))
+		tag.div(
+			htmlContent(
+				'<div><p>foo</p><p class="pretty" style="red">bar</p><p>baz</p></div>'
+			)
+		)
 	)
 	const div = tag.div(
-		htmlContent('<div><p>foo</p><p style="background: pink">bar</p><p>baz</p></div>')
+		htmlContent(
+			'<div><p>foo</p><p style="background: pink">bar</p><p>baz</p></div>'
+		)
 	)
 	render(div, root)
 	checkDOM(div)
 })
 
 test("unsupported element", function() {
-	expect(() => render(() => ({def: {type: -1}}), root)).toThrow(/unsupported/)
+	expect(() => render(() => ({def: {type: -1}}), root)).toThrow(
+		/unsupported/
+	)
 })

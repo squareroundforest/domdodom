@@ -8,11 +8,15 @@ function mul32(int1, int2) {
 	return (higher + lower) | 0
 }
 
-const bytesOf = int => ((int & 255) === int ? [int] : bytesOf(int >>> 8).concat(int & 255))
+const bytesOf = int =>
+	(int & 255) === int
+		? [int]
+		: bytesOf(int >>> 8).concat(int & 255)
 
 const addByte = (int, b) => mul32(int ^ b, fnvPrime32)
 
-const hashSum = (...ints) => ints.reduce((h, int) => bytesOf(int).reduce(addByte, h))
+const hashSum = (...ints) =>
+	ints.reduce((h, int) => bytesOf(int).reduce(addByte, h))
 
 export function series(seed) {
 	const keys = {}

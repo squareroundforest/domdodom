@@ -4,7 +4,9 @@ import {htmlContent, render, tag} from "../../.."
 
 const app = tag.div(
 	{id: "root"},
-	htmlContent("<div id='ref'><ul><li>foo</li><li>bar</li><li>baz</li></ul></div>")
+	htmlContent(
+		"<div id='ref'><ul><li>foo</li><li>bar</li><li>baz</li></ul></div>"
+	)
 )
 
 export const page = tag.html(
@@ -14,9 +16,21 @@ export const page = tag.html(
 )
 
 if (typeof window !== "undefined") {
-	const initial = tag.div({id: "ref"}, tag.div("foo"), tag.div("bar"), tag.div("baz"), tag.div("qux"))
+	const initial = tag.div(
+		{id: "ref"},
+		tag.div("foo"),
+		tag.div("bar"),
+		tag.div("baz"),
+		tag.div("qux")
+	)
 
-	const update = tag.div({id: "ref"}, tag.div("foo"), tag.code("bar"), tag.div("baz"), tag.div("qux"))
+	const update = tag.div(
+		{id: "ref"},
+		tag.div("foo"),
+		tag.code("bar"),
+		tag.div("baz"),
+		tag.div("qux")
+	)
 
 	render(initial, document.getElementById("ref"))
 	setTimeout(function() {

@@ -4,7 +4,8 @@ import {markup} from "."
 
 export let root
 
-export const checkDOM = n => expect(document.body.innerHTML).toBe(markup(n))
+export const checkDOM = n =>
+	expect(document.body.innerHTML).toBe(markup(n))
 
 export function initDOM(n) {
 	document.body.innerHTML = markup(n({id: "root"}))
@@ -12,7 +13,11 @@ export function initDOM(n) {
 }
 
 const capturedElementsAndText = captured =>
-	captured.filter(c => [Node.ELEMENT_NODE, Node.TEXT_NODE].some(t => t === c.node.nodeType))
+	captured.filter(c =>
+		[Node.ELEMENT_NODE, Node.TEXT_NODE].some(
+			t => t === c.node.nodeType
+		)
+	)
 
 export function captureDOM(node) {
 	const captured = {node}
@@ -50,10 +55,16 @@ export function capturedEq(prev, next) {
 	const prevNodes = capturedElementsAndText(prev.children)
 	const nextNodes = capturedElementsAndText(next.children)
 	return (
-		prevNodes.every((n, i) => capturedEq(n, nextNodes[i])) &&
+		prevNodes.every((n, i) =>
+			capturedEq(n, nextNodes[i])
+		) &&
 		prev.attributes.length === next.attributes.length &&
 		prev.attributes.every(pa =>
-			next.attributes.some(na => na.name === pa.name && na.value === pa.value)
+			next.attributes.some(
+				na =>
+					na.name === pa.name &&
+					na.value === pa.value
+			)
 		)
 	)
 }

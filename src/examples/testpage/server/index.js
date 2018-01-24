@@ -11,7 +11,9 @@ flags.defineBoolean("pretty")
 flags.parse()
 
 function index(_, res) {
-	res.write((flags.get("pretty") ? pretty : x => x)(markupDoc(page)))
+	res.write(
+		(flags.get("pretty") ? pretty : x => x)(markupDoc(page))
+	)
 	res.end()
 }
 
