@@ -36,8 +36,33 @@ check: $(SOURCE) $(CONFIG)
 checkwatch: $(SOURCE) $(CONFIG)
 	npx --no-install jest --watch
 
+lint: $(SOURCE) $(CONFIG) # fmt
+	npx --no-install eslint --no-color --fix $(SOURCE) *.js
+
 check-lint: $(SOURCE) $(CONFIG)
-	@npx --no-install standard $(SOURCE) *.js
+	npx --no-install eslint --no-color $(SOURCE) *.js
+
+prettieroptions = --no-config \
+		--no-color \
+		--arrow-parens avoid \
+		--no-bracket-spacing \
+		--tab-width 8 \
+		--print-width 108 \
+		--no-semi \
+		--trailing-comma es5 \
+		--use-tabs
+
+fmt: $(SOURCE) $(CONFIG)
+	@npx --no-install prettier \
+		--write \
+		$(prettieroptions) \
+		$(SOURCE) *.js
+
+check-fmt: $(SOURCE) $(CONFIG)
+	@npx --no-install prettier \
+		--list-different \
+		$(prettieroptions) \
+		$(SOURCE) *.js
 
 snyk: $(CONFIG)
 	npx --no-install snyk --quiet test
@@ -46,10 +71,7 @@ check-deps: $(CONFIG)
 	@echo snyk currently disabled for test run limitations
 	@echo you can run it explicitly by calling 'make snyk'
 
-lint: $(SOURCE) $(CONFIG)
-	@npx --no-install standard --fix $(SOURCE) *.js
-
-check-all: check-lint check-deps
+check-all: check-lint check-fmt check-deps
 	npx --no-install jest --silent --all
 
 precommit: $(SOURCE) $(CONFIG) check-all build

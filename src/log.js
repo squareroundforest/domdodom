@@ -1,8 +1,10 @@
-export const log = (...args) => {
-  console.error(...args)
-  if (args.length === 0) {
-    return
-  }
+/* global console */
 
-  return args[args.length - 1]
+export function log(...args) {
+	console.error(...args)
+	if (args.length === 0) {
+		return
+	}
+
+	return args[args.length - 1]
 }
