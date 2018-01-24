@@ -1,3 +1,8 @@
+const isProps = a => a.constructor === Object
+const isChild = a => !isProps(a)
+const getProps = args => args.filter(isProps).map(propNames)
+const getChildren = args => args.filter(isChild)
+
 function propNames(props) {
 	const renamed = {}
 	Object.keys(props).forEach(function(name) {
@@ -7,11 +12,6 @@ function propNames(props) {
 
 	return renamed
 }
-
-const isProps = a => a.constructor === Object
-const isChild = a => !isProps(a)
-const getProps = args => args.filter(isProps).map(propNames)
-const getChildren = args => args.filter(isChild)
 
 // TODO:
 // - support base props during definition (for classes)?
@@ -55,22 +55,29 @@ function element(spec, ...args) {
 	return el(...args)
 }
 
-const defineElement = (def, options, ...args) =>
-	element({
+function defineElement(def, options, ...args) {
+	return element({
 		def: Object.assign({}, options, def),
 		props: Object.assign({}, ...getProps(args)),
 		children: [...getChildren(args)],
 	})
+}
 
-const defineTag = (name, options, ...args) =>
-	defineElement({type: nodeType.tag, name}, options, ...args)
+function defineTag(name, options, ...args) {
+	return defineElement(
+		{type: nodeType.tag, name},
+		options,
+		...args
+	)
+}
 
-const defineComponent = (c, options, ...args) =>
+function defineComponent(c, options, ...args) {
 	defineElement(
 		{type: nodeType.component, component: c},
 		options,
 		...args
 	)
+}
 
 export const nodeType = {
 	tag: 0,
@@ -82,6 +89,7 @@ export const nodeType = {
 export class DefinitionError extends Error {}
 export const isElement = a => typeof a === "function"
 export const inspect = element => element(inspect)
+export const define = (d, ...args) => defineWithOptions(d, {}, ...args)
 
 // TODO: why can't this just be props
 // options can be: {isVoid: true, sealed: true}
@@ -95,8 +103,6 @@ export function defineWithOptions(d, options, ...args) {
 			throw new DefinitionError("invalid definition")
 	}
 }
-
-export const define = (d, ...args) => defineWithOptions(d, {}, ...args)
 
 export function htmlContent(html) {
 	if (isElement(html)) {

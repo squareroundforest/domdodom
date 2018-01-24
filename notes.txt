@@ -1,0 +1,5 @@
+this question stayed unanswered: https://stackoverflow.com/questions/45060233/in-what-situations-react-creates-a-new-instance-of-a-component
+
+it's actually two questions: in React...
+- is the component always reinstantiated when the dom structure or its key changes
+- is the component never reinstantiated when the dom structure or its key doesn't change
