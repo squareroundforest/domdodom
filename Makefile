@@ -37,10 +37,10 @@ checkwatch: $(SOURCE) $(CONFIG)
 	npx --no-install jest --watch
 
 lint: $(SOURCE) $(CONFIG) # fmt
-	npx --no-install eslint --no-color --fix $(SOURCE) *.js
+	@npx --no-install eslint --no-color --fix $(SOURCE) *.js
 
 check-lint: $(SOURCE) $(CONFIG)
-	npx --no-install eslint --no-color $(SOURCE) *.js
+	@npx --no-install eslint --no-color $(SOURCE) *.js
 
 prettieroptions = --no-config \
 		--no-color \

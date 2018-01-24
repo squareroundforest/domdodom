@@ -27,7 +27,7 @@ test("no diff, html", function() {
 	const before = captureDOM(document.getElementById("list"))
 	render(html, document.getElementById("list"))
 	const after = captureDOM(document.getElementById("list"))
-	expect(capturedEq(before, after))
+	expect(capturedEq(before, after)).toBe(true)
 })
 
 test("only required diff", function() {
