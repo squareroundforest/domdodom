@@ -72,7 +72,7 @@ function defineTag(name, options, ...args) {
 }
 
 function defineComponent(c, options, ...args) {
-	defineElement(
+	return defineElement(
 		{type: nodeType.component, component: c},
 		options,
 		...args
