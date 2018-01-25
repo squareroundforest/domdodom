@@ -3,12 +3,13 @@
 import {define, htmlContent, tag} from "."
 
 test("extend sealed", () =>
-	expect(() =>
-		htmlContent("foo")({style: "background: red"})
-	).toThrow(/sealed/))
+  expect(() => htmlContent("foo")({style: "background: red"})).toThrow(
+    /sealed/
+  ))
+
 test("children for void", () =>
-	expect(() => tag.br("foo")).toThrow(/void/))
+  expect(() => tag.br("foo")).toThrow(/void/))
 test("invalid definition", () =>
-	expect(() => define(42)).toThrow(/invalid/))
+  expect(() => define(42)).toThrow(/invalid/))
 test("html content with element", () =>
-	expect(() => htmlContent(tag.p("foo"))).toThrow(/element/))
+  expect(() => htmlContent(tag.p("foo"))).toThrow(/element/))

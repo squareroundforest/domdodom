@@ -11,10 +11,8 @@ flags.defineBoolean("pretty")
 flags.parse()
 
 function index(_, res) {
-	res.write(
-		(flags.get("pretty") ? pretty : x => x)(markupDoc(page))
-	)
-	res.end()
+  res.write((flags.get("pretty") ? pretty : x => x)(markupDoc(page)))
+  res.end()
 }
 
 const server = express()

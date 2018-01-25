@@ -46,11 +46,10 @@ prettieroptions = --no-config \
 		--no-color \
 		--arrow-parens avoid \
 		--no-bracket-spacing \
-		--tab-width 8 \
+		--tab-width 2 \
 		--print-width 72 \
 		--no-semi \
 		--trailing-comma es5 \
-		--use-tabs
 
 fmt: $(SOURCE) $(CONFIG)
 	@npx --no-install prettier \

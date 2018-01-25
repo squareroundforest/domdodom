@@ -12,45 +12,45 @@ const refCache = new WeakMap()
 const isRef = () => false
 
 function renderView(/*view, ref*/) {
-	// the ref has the tree, with the dom nodes referenced
-	// check the hash
-	// if the hash doesn't equal, then type checking is required
-	// if view is text, then remove all ref nodes but the first one if it's a text node and set the text
-	// if view is tag, then remove all ref nodes but the first one it it's the same tag, and render the tag
-	// if view is html, then sync the nodes, like in mount
+  // the ref has the tree, with the dom nodes referenced
+  // check the hash
+  // if the hash doesn't equal, then type checking is required
+  // if view is text, then remove all ref nodes but the first one if it's a text node and set the text
+  // if view is tag, then remove all ref nodes but the first one it it's the same tag, and render the tag
+  // if view is html, then sync the nodes, like in mount
 }
 
 function inspectRef(/*ref*/) {}
 
 // what, where
 export function render(view, ref) {
-	const refSet = Boolean(ref)
-	const isItARef = refSet && isRef(ref)
-	const isItANode = refSet && ref instanceof Node
+  const refSet = Boolean(ref)
+  const isItARef = refSet && isRef(ref)
+  const isItANode = refSet && ref instanceof Node
 
-	if (refSet && !isItARef && !isItANode) {
-		throw new RenderError(
-			"reference must be a render reference or a DOM node"
-		)
-	}
+  if (refSet && !isItARef && !isItANode) {
+    throw new RenderError(
+      "reference must be a render reference or a DOM node"
+    )
+  }
 
-	// using the body, probably:
-	if (!refSet) {
-		throw new RenderError("not implemented")
-	}
+  // using the body, probably:
+  if (!refSet) {
+    throw new RenderError("not implemented")
+  }
 
-	if (isItARef) {
-		return renderView(resolve(view), inspectRef(ref))
-	}
+  if (isItARef) {
+    return renderView(resolve(view), inspectRef(ref))
+  }
 
-	if (isItANode) {
-		const cached = refCache.get(ref)
-		if (cached) {
-			return renderView(resolve(view), cached)
-		}
-	}
+  if (isItANode) {
+    const cached = refCache.get(ref)
+    if (cached) {
+      return renderView(resolve(view), cached)
+    }
+  }
 
-	return mount(view, ref)
+  return mount(view, ref)
 }
 
 /*
